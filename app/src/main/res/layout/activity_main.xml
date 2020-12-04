@@ -120,7 +120,7 @@
         app:layout_constraintTop_toBottomOf="@id/barrierBottom" />
 
     <ImageView
-        android:id="@+id/share"
+        android:id="@+id/shareImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -131,9 +131,10 @@
         app:srcCompat="@drawable/ic_baseline_share_24" />
 
     <TextView
+        android:id="@+id/shareTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/share"
+        app:layout_constraintStart_toEndOf="@id/shareImg"
         app:layout_constraintTop_toBottomOf="@id/barrierBottom"
         android:paddingStart="@dimen/halfSpacing"
         android:layout_marginTop="@dimen/spacing"
