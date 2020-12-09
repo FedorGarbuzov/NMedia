@@ -3,9 +3,10 @@ package ru.netology.nmedia
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.TextView
+import androidx.activity.viewModels
 import ru.netology.nmedia.databinding.ActivityMainBinding
+import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.viewModel.PostViewModel
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("ResourceType")
@@ -14,45 +15,33 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val post = Post(
-                id = 1,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb",
-                share = 100_999_999,
-                likes = 100_999,
-                views = 999,
-                likedByMe = false
-        )
+        val viewModel: PostViewModel by viewModels()
+        viewModel.data.observe(this, {
+            with(binding) {
+                userName.text = it.author
+                published.text = it.published
+                content.text = it.content
+                shareTxt.text = display(it.share)
+                likes.text = display(it.likes)
+                views.text = display(it.views)
 
-        with(binding) {
-            userName.text = post.author
-            published.text = post.published
-            content.text = post.content
-            shareTxt.text = display(post.share)
-            likes.text = display(post.likes)
-            views.text = display(post.views)
-            if (post.likedByMe) {
-                favorite?.setImageResource(R.drawable.ic_baseline_favorite_24)
-            }
-
-            favorite?.setOnClickListener {
-                post.likedByMe = !post.likedByMe
                 favorite.setImageResource(
-                        if (post.likedByMe) R.drawable.ic_baseline_favorite_border_24 else R.drawable.ic_baseline_favorite_24
-                )
-                var likesQuantity = post.likes
+                        if (it.likedByMe) R.drawable.ic_baseline_favorite_border_24 else R.drawable.ic_baseline_favorite_24)
                 likes.setText(
-                        if (post.likedByMe) display(likesQuantity) else display(likesQuantity + 1))
-            }
+                        if (it.likedByMe) display(it.likes) else display(it.likes + 1))
 
-            shareImg?.setOnClickListener {
-                var shareQuantity = post.share + 1
-                shareTxt.setText(display(shareQuantity))
-                post.share++
+                shareTxt.setText(display(it.share))
+            }
+        })
+
+        binding.favorite.setOnClickListener {
+            viewModel.like()
+        }
+
+        binding.shareImg.setOnClickListener {
+                viewModel.share()
             }
         }
-    }
 
     private fun display(num: Int): String {
         val first = Character.getNumericValue(num.toString()[0])
@@ -68,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             (num in 10_000_000..99_999_999) -> newString = "${first}${second}.${third}M"
             (num in 100_000_000..999_999_000) -> newString = "${first}${second}${third}M"
         }
-            return newString
+        return newString
     }
 }
 
