@@ -3,4 +3,6 @@
     <string name="likes">183</string>
     <string name="share">999</string>
     <string name="views">863</string>
+    <string name="post_text">Post Text</string>
+    <string name="empty_content">Content can\'t be empty</string>
 </resources>

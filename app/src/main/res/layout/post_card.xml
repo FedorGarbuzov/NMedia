@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/spacing"
     tools:context=".MainActivity">
@@ -16,7 +16,7 @@
         tools:srcCompat="@sample/postAvatar" />
 
     <ImageView
-        android:id="@+id/moreVert"
+        android:id="@+id/postMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/spacing"
@@ -30,15 +30,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/spacing"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@+id/published"
-        app:layout_constraintEnd_toStartOf="@+id/moreVert"
+        tools:text="@sample/posts.json/data/author"
+        app:layout_constraintEnd_toStartOf="@+id/postMenu"
         app:layout_constraintStart_toEndOf="@+id/postAvatar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="@sample/posts.json/data/author" />
+        app:layout_constraintBottom_toTopOf="@+id/published"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/published"
@@ -55,12 +55,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="postAvatar, moreVert, userName, published" />
+        app:constraint_referenced_ids="postAvatar, postMenu, userName, published" />
 
     <TextView
         android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing"
         android:autoLink="web"
         app:layout_constraintEnd_toEndOf="parent"
@@ -75,7 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="postAvatar, moreVert, userName, published, content" />
+        app:constraint_referenced_ids="postAvatar, postMenu, userName, published, content" />
 
     <TextView
         android:id="@+id/views"
