@@ -3,6 +3,7 @@ package ru.netology.nmedia
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import ru.netology.nmedia.adapter.OnInterractionListener
@@ -72,8 +73,21 @@ class MainActivity : AppCompatActivity() {
                 AndroidUtils.hideKeyboard(this)
             }
         }
+
+        binding.cancel.setOnClickListener {
+            with(binding.widgetGroup) {
+                with(binding.content) {
+                    setText("")
+                    clearFocus()
+                }
+                this.visibility = View.VISIBLE
+                AndroidUtils.hideKeyboard(this)
+            } 
+        }
     }
 }
+    
+
 
 
 
