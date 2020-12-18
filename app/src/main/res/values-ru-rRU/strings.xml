@@ -4,4 +4,6 @@
     <string name="likes">183</string>
     <string name="share">999</string>
     <string name="views">863</string>
+    <string name="post_text">Текст</string>
+    <string name="empty_content">Поле не может быть пустым</string>
 </resources>
