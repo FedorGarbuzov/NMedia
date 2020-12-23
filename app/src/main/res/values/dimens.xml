@@ -3,4 +3,5 @@
     <dimen name="spacing">16dp</dimen>
     <dimen name="halfSpacing">8dp</dimen>
     <dimen name="avatarSize">48dp</dimen>
+    <dimen name="icon_button_size">48dp</dimen>
 </resources>
