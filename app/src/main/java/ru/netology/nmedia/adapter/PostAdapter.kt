@@ -40,16 +40,14 @@ class PostViewHolder(
             userName.text = post.author
             published.text = post.published
             content.text = post.content
-            shareTxt.text = display(post.share)
-            likes.text = display(post.likes)
+            share.text = display(post.share)
+            favorite.text = display(post.likes)
             views.text = display(post.views)
 
-            favorite.setImageResource(
-                    if (!post.likedByMe) R.drawable.ic_baseline_favorite_border_24 else R.drawable.ic_baseline_favorite_24)
-            likes.setText(
-                    if (!post.likedByMe) display(post.likes) else display(post.likes + 1))
+            favorite.isChecked = post.likedByMe
+            favorite.text = display(post.likes)
 
-            shareTxt.setText(display(post.share))
+            share.setText(display(post.share))
 
             postMenu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
@@ -74,7 +72,7 @@ class PostViewHolder(
                 onInterractionListener.onLike(post)
             }
 
-            shareImg.setOnClickListener {
+            share.setOnClickListener {
                 onInterractionListener.onShare(post)
             }
         }
