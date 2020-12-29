@@ -12,58 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/toolsTop"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp"
         tools:listitem="@layout/post_card" />
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/toolsTop"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:barrierDirection="top"
-        app:constraint_referenced_ids="content,save" />
-
-    <EditText
-        android:id="@+id/content"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/post_text"
-        android:inputType="textMultiLine"
-        android:background="@android:color/transparent"
-        android:padding="@dimen/spacing"
-        android:importantForAutofill="no"
-        app:layout_constraintTop_toTopOf="@id/toolsTop"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/save"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageButton
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing"
-        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@drawable/ic_baseline_check_circle_outline_24" />
-
-    <ImageButton
-        android:id="@+id/cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/content"
-        app:layout_constraintTop_toBottomOf="@+id/toolsTop"
-        app:srcCompat="@drawable/ic_baseline_clear_24" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/widgetGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:constraint_referenced_ids="save,cancel, content" />
+        android:layout_margin="@dimen/spacing"
+        app:srcCompat="@drawable/ic_baseline_add_24" />
 </androidx.constraintlayout.widget.ConstraintLayout>
