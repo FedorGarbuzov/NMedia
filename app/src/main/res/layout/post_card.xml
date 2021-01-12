@@ -73,6 +73,20 @@
         app:layout_constraintTop_toBottomOf="@id/barrier"
         tools:text="@sample/posts.json/data/content" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:layout_constraintTop_toBottomOf="@id/content"
+        app:layout_constraintBottom_toTopOf="@id/barrierBottom"
+        android:background="@drawable/video_background"
+        android:layout_margin="@dimen/spacing"
+        app:icon="@drawable/ic_baseline_play_circle_outline_24"
+        app:iconGravity="textStart"
+        android:checkable="true"
+        app:iconSize="@dimen/icon_button_size"
+        app:iconTint="?attr/colorControlNormal" />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrierBottom"
         android:layout_width="wrap_content"
@@ -91,8 +105,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintTop_toBottomOf="@id/barrierBottom"
-        tools:text="@sample/posts.json/data/views">
-    </com.google.android.material.button.MaterialButton>
+        tools:text="@sample/posts.json/data/views" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/favorite"
@@ -107,8 +120,7 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrierBottom"
-        tools:text="@sample/posts.json/data/likes">
-    </com.google.android.material.button.MaterialButton>
+        tools:text="@sample/posts.json/data/likes" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/share"
@@ -121,6 +133,5 @@
         app:icon="@drawable/ic_baseline_share_24"
         app:layout_constraintStart_toEndOf="@id/favorite"
         app:layout_constraintTop_toBottomOf="@id/barrierBottom"
-        tools:text="@sample/posts.json/data/share">
-    </com.google.android.material.button.MaterialButton>
+        tools:text="@sample/posts.json/data/share" />
 </androidx.constraintlayout.widget.ConstraintLayout>
