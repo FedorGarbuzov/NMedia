@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.PostCardBinding
 import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.util.AndroidUtils.display
 
 interface OnInterractionListener {
     fun onLike(post: Post) {}
@@ -19,6 +21,7 @@ interface OnInterractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onPlayMedia(post: Post) {}
+    fun onOpenCard(post: Post) {}
 }
 
 class PostAdapter(
@@ -47,6 +50,7 @@ class PostViewHolder(
             share.text = display(post.share)
             favorite.text = display(post.likes)
             views.text = display(post.views)
+            video.text = post.url
             if (post.url == null) video.visibility = View.GONE
 
             favorite.isChecked = post.likedByMe
@@ -84,25 +88,11 @@ class PostViewHolder(
             video.setOnClickListener {
                 onInterractionListener.onPlayMedia(post)
             }
-        }
-    }
 
-    private fun display(num: Int): String {
-        var newString = "$num"
-        if (num >= 1_000) {
-            val first = Character.getNumericValue(num.toString()[0])
-            val second = Character.getNumericValue(num.toString()[1])
-            val third = Character.getNumericValue(num.toString()[2])
-            when {
-                (num in 1_000..9_999) -> newString = "${first}.${second}K"
-                (num in 10_000..99_999) -> newString = "${first}${second}K"
-                (num in 100_000..999_999) -> newString = "${first}${second}${third}K"
-                (num in 1_000_000..9_999_999) -> newString = "${first}.${second}M"
-                (num in 10_000_000..99_999_999) -> newString = "${first}${second}.${third}M"
-                (num in 100_000_000..999_999_000) -> newString = "${first}${second}${third}M"
+            binding.root.setOnClickListener {
+                onInterractionListener.onOpenCard(post)
             }
         }
-        return newString
     }
 }
 

@@ -37,7 +37,6 @@ class PostRepositoryImpl(
         }
     }
 
-
     override fun getAll(): LiveData<List<Post>> = data
 
     @RequiresApi(Build.VERSION_CODES.O)
