@@ -21,14 +21,16 @@ val emptyPost = Post(
     likedByMe = false
 )
 
-class PostViewModel (application: Application) : AndroidViewModel(application) {
+class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository = PostRepositoryImpl(application)
     val data = repository.getAll()
     private val edited = MutableLiveData(emptyPost)
 
     fun save() {
         edited.value?.let {
-            repository.save(it)
+            if (it.content?.isNotBlank() == true) {
+                repository.save(it)
+            }
         }
         edited.value = emptyPost
     }
