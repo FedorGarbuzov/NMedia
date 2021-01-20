@@ -23,13 +23,11 @@ data class Post(
             parcel.readInt(),
             parcel.readInt(),
             parcel.readString(),
-            parcel.readByte() != 0.toByte()) {
-    }
+            parcel.readByte() != 0.toByte())
 
     override fun describeContents(): Int {
         TODO("Not yet implemented")
     }
-
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(id)
