@@ -4,26 +4,27 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Post(
-        val id: Long,
-        val author: String,
-        val published: String,
-        val content: String?,
-        val share: Int,
-        val likes: Int,
-        val views: Int,
-        val url: String?,
-        val likedByMe: Boolean = false
-        ) : Parcelable {
+    val id: Long,
+    val author: String,
+    val published: String,
+    val content: String,
+    val share: Int,
+    val likes: Int,
+    val views: Int,
+    val url: String?,
+    val likedByMe: Boolean = false
+) : Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readLong(),
-            parcel.readString().toString(),
-            parcel.readString().toString(),
-            parcel.readString(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readString(),
-            parcel.readByte() != 0.toByte())
+        parcel.readLong(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readString(),
+        parcel.readByte() != 0.toByte()
+    )
 
     override fun describeContents(): Int {
         TODO("Not yet implemented")
