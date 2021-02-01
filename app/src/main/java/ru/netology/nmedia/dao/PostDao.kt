@@ -27,14 +27,21 @@ interface PostDao {
         likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
         WHERE id = :id
 """)
+    fun likeByMe(id: Long)
+
+    @Query("""
+        UPDATE PostEntity SET
+        likes = likes + 1
+        WHERE id = :id
+    """)
     fun likeById(id: Long)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun save(post: PostEntity) {
         if (post.id == 0L) insert(
-            post.copy(
-                author = "Me", published = LocalDateTime.now().format(
-                    DateTimeFormatter.ofPattern("dd MMMM в HH:MM")
+            post.copy(author = if(post.author == "") "Me" else post.author,
+                published = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("dd MMMM в HH:mm")
                 )
             )
         ) else updateContentById(post.content, post.id)
