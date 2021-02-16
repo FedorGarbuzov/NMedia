@@ -23,6 +23,10 @@ class PostRepositoryImp(
         dao.save(PostEntity.fromPost(post))
     }
 
+    override fun likeByMe(id: Long) {
+        dao.likeByMe(id)
+    }
+
     override fun likeById(id: Long) {
         dao.likeById(id)
     }

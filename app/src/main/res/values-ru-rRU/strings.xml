@@ -6,4 +6,10 @@
     <string name="views">863</string>
     <string name="post_text">Текст</string>
     <string name="empty_content">Поле не может быть пустым</string>
+    <string name="google_play_unavailable">Google Api Недоступно</string>
+    <string name="notification_user_liked">%1$s поставил лайк посту %2$s</string>
+    <string name="notification_user_share">%1$s полелился постом %2$s</string>
+    <string name="notification_user_post_title"><b>%1$s опубликовал новый пост:</b></string>
+    <string name="channel_remote_name">Уведомления с сервера</string>
+    <string name="channel_remote_description">Уведомления с удалённого сервера</string>
 </resources>

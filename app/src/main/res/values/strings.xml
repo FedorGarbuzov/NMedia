@@ -6,4 +6,10 @@
     <string name="post_text">Post Text</string>
     <string name="empty_content">Content can\'t be empty</string>
     <string name="app_not_found" translatable="false">Приложение не найдено"</string>
+    <string name="google_play_unavailable">Google Api Unavailable</string>
+    <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
+    <string name="notification_user_share">User %1$s share %2$s\'s post</string>
+    <string name="notification_user_post_title">%1$s published a new post:</string>
+    <string name="channel_remote_name">Server notifications</string>
+    <string name="channel_remote_description">Notifications from remote server</string>
 </resources>
