@@ -7,16 +7,22 @@
     android:layout_height="match_parent"
     tools:context=".FeedFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/postsList"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="0dp"
-        tools:listitem="@layout/post_card" />
+        android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/postsList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            tools:layout_editor_absoluteX="0dp"
+            tools:listitem="@layout/post_card" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add"
