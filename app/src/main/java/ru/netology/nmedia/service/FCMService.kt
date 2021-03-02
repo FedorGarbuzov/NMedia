@@ -13,7 +13,6 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import ru.netology.nmedia.AppActivity
 import ru.netology.nmedia.R
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImp
@@ -112,7 +111,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().save(content)
+        getRepository().saveAsync(content, object : PostRepository.SaveCallback{})
     }
 
     private fun handleMessage(message: RemoteMessage) {
@@ -131,8 +130,7 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun getRepository(): PostRepository {
-        val repository: PostRepository = PostRepositoryImp()
-        return repository
+        return PostRepositoryImp()
     }
 
     private fun getPendingIntent(): PendingIntent {

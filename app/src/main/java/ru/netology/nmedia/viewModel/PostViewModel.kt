@@ -14,15 +14,16 @@ import java.io.IOException
 import kotlin.concurrent.thread
 
 val emptyPost = Post(
-        id = 0L,
-        author = "",
-        published = "",
-        content = "",
-        share = 0,
-        likes = 0,
-        views = 0,
-        url = null,
-        likedByMe = false
+    id = 0L,
+    author = "",
+    authorAvatar = "",
+    published = "",
+    content = "",
+    share = 0,
+    likes = 0,
+    views = 0,
+    url = null,
+    likedByMe = false
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,23 +41,25 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadPosts() {
-        thread {
-            _data.postValue(FeedModel(loading = true))
-            try {
-                val posts = repository.getAll()
-                FeedModel(posts = posts, empty = posts.isEmpty())
-            } catch (e: IOException) {
+        _data.postValue(FeedModel(loading = true))
+        repository.getAllAsync(object : PostRepository.GetAllCallback {
+            override fun onSuccess(posts: List<Post>) {
+                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+            }
+
+            override fun onError(e: Exception) {
                 FeedModel(error = true)
-            }.also(_data::postValue)
-        }
+            }
+        })
     }
 
     fun save() {
         edited.value?.let {
-            thread {
-                repository.save(it)
-                _postCreated.postValue(Unit)
-            }
+            repository.saveAsync(it, object : PostRepository.SaveCallback {
+                override fun onSuccess(post: Post) {
+                    _postCreated.postValue(Unit)
+                }
+            })
         }
         edited.value = emptyPost
     }
@@ -73,27 +76,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value = edited.value?.copy(content = text)
     }
 
-    fun removeById(id: Long) = thread {
-        val old = _data.value?.posts.orEmpty()
-        _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                        .filter { it.id != id }
-                )
-        )
-        try {
-            repository.removeById(id)
-        } catch (e: IOException) {
-            _data.postValue(_data.value?.copy(posts = old))
-        }
-    }
-
-    fun likeByMe(id: Long) = thread {
-        repository.likeByMe(id)
+    fun removeById(id: Long) {
+        repository.removeByIdAsync(id, object : PostRepository.RemoveByIdCallback {})
         loadPosts()
     }
 
-    fun unlikeByMe(id: Long) = thread {
-        repository.unlikeByMe(id)
+    fun likeByMe(id: Long) {
+        repository.likeByMeAsync(id, object : PostRepository.LikeByMeCallback {})
+        loadPosts()
+    }
+
+
+    fun unlikeByMe(id: Long) {
+        repository.unlikeByMeAsync(id, object : PostRepository.UnlikeByMeCallback {})
         loadPosts()
     }
 
