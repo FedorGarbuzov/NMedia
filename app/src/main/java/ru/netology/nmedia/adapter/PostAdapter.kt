@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.PostCardBinding
 import ru.netology.nmedia.post.Post
@@ -27,8 +28,23 @@ interface OnInterractionListener {
 class PostAdapter(
         private val onInterractionListener: OnInterractionListener
 ) : ListAdapter<Post, PostViewHolder>(PostDiffCallBack()) {
+    private val urls = listOf("tcs.jpg", "sber.jpg", "netology.jpg", "404.png")
+    private var index = 0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        if (index == urls.size) {
+            index = 0
+        }
+
+        val url = "http://10.0.2.2:9999/avatars/${urls[index++]}"
+        Glide.with(binding.postAvatar)
+                .load(url)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(binding.postAvatar)
+
         return PostViewHolder(binding, onInterractionListener)
     }
 
@@ -56,7 +72,7 @@ class PostViewHolder(
             favorite.isChecked = post.likedByMe
             favorite.text = display(post.likes)
 
-            share.setText(display(post.share))
+            share.text = display(post.share)
 
             postMenu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
