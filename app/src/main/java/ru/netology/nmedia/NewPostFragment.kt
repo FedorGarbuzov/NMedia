@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
+import ru.netology.nmedia.post.Attachment
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewModel.PostViewModel
@@ -48,6 +50,10 @@ class NewPostFragment : Fragment() {
             AndroidUtils.hideKeyboard(requireView())
             viewModel.loadPosts()
             findNavController().navigate(R.id.feedFragment)
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            findNavController().popBackStack()
         }
 
         return binding.root

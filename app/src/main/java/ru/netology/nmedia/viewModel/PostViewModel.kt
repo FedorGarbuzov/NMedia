@@ -16,16 +16,17 @@ import java.io.IOException
 import kotlin.concurrent.thread
 
 val emptyPost = Post(
-    id = 0L,
-    author = "",
-    authorAvatar = "",
-    published = "",
-    content = "",
-    share = 0,
-    likes = 0,
-    views = 0,
-    url = null,
-    likedByMe = false
+        id = 0L,
+        author = "",
+        authorAvatar = "",
+        published = "",
+        content = "",
+        share = 0,
+        likes = 0,
+        views = 0,
+        url = null,
+        likedByMe = false,
+        attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {

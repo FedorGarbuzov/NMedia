@@ -2,6 +2,7 @@ package ru.netology.nmedia.post
 
 import android.os.Parcel
 import android.os.Parcelable
+import ru.netology.nmedia.enum.AttachmentType
 
 data class Post(
         val id: Long,
@@ -14,6 +15,7 @@ data class Post(
         val views: Int,
         val url: String?,
         val likedByMe: Boolean = false,
+        val attachment: Attachment? = null
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readLong(),
@@ -55,3 +57,9 @@ data class Post(
         }
     }
 }
+
+data class Attachment(
+        val url: String,
+        val description: String,
+        val type: AttachmentType
+)

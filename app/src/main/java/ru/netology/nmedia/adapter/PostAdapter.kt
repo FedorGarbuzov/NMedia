@@ -1,12 +1,9 @@
 package ru.netology.nmedia.adapter
 
-import android.net.Uri
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -26,25 +23,10 @@ interface OnInterractionListener {
 }
 
 class PostAdapter(
-        private val onInterractionListener: OnInterractionListener
+        private val onInterractionListener: OnInterractionListener,
 ) : ListAdapter<Post, PostViewHolder>(PostDiffCallBack()) {
-    private val urls = listOf("tcs.jpg", "sber.jpg", "netology.jpg", "404.png")
-    private var index = 0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
-        if (index == urls.size) {
-            index = 0
-        }
-
-        val url = "http://10.0.2.2:9999/avatars/${urls[index++]}"
-        Glide.with(binding.postAvatar)
-                .load(url)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .circleCrop()
-                .into(binding.postAvatar)
 
         return PostViewHolder(binding, onInterractionListener)
     }
@@ -57,18 +39,18 @@ class PostAdapter(
 
 class PostViewHolder(
         private val binding: PostCardBinding,
-        private val onInterractionListener: OnInterractionListener
+        private val onInterractionListener: OnInterractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {
         binding.apply {
             userName.text = post.author
+            postAvatar.setImageResource(itemViewType)
             published.text = post.published
             content.text = post.content
             share.text = display(post.share)
             favorite.text = display(post.likes)
             views.text = display(post.views)
-            video.text = post.url
-            if (post.url == null) video.visibility = View.GONE
+            if (post.attachment?.url == null) attachment.visibility = View.GONE
 
             favorite.isChecked = post.likedByMe
             favorite.text = display(post.likes)
@@ -94,6 +76,23 @@ class PostViewHolder(
                 }.show()
             }
 
+            val url = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
+            Glide.with(binding.postAvatar)
+                    .load(url)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .circleCrop()
+                    .into(binding.postAvatar)
+
+            val attUrl = "http://10.0.2.2:9999/images/${post.attachment?.url}"
+            Glide.with(binding.attachment)
+                    .load(attUrl)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.attachment)
+
             favorite.setOnClickListener {
                 onInterractionListener.onLike(post)
             }
@@ -102,7 +101,7 @@ class PostViewHolder(
                 onInterractionListener.onShare(post)
             }
 
-            video.setOnClickListener {
+            attachment.setOnClickListener {
                 onInterractionListener.onPlayMedia(post)
             }
 
