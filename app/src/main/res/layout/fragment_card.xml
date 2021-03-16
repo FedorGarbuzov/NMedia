@@ -14,7 +14,7 @@
       android:layout_height="@dimen/avatarSize"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      tools:srcCompat="@sample/postAvatar" />
+      tools:srcCompat="@sample/posts.json/data/authorAvatar" />
 
   <com.google.android.material.button.MaterialButton
       android:id="@+id/postMenu"
@@ -85,21 +85,20 @@
           android:layout_height="wrap_content"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintBottom_toTopOf="@id/video"
+          app:layout_constraintBottom_toTopOf="@id/attachment"
           android:autoLink="web"
           android:lineSpacingExtra="@dimen/spacing"
           tools:layout_editor_absoluteX="16dp"
           tools:layout_editor_absoluteY="16dp"
           tools:text="@sample/posts.json/data/content" />
 
-      <com.google.android.material.button.MaterialButton
-          android:id="@+id/video"
+      <ImageView
+          android:id="@+id/attachment"
           android:layout_width="match_parent"
-          android:layout_height="150dp"
-          android:layout_margin="@dimen/spacing"
-          android:background="@drawable/video_background"
+          android:layout_height="250dp"
+          android:layout_margin="@dimen/halfSpacing"
+          android:background="@android:color/transparent"
           android:checkable="true"
-          app:icon="@drawable/ic_baseline_play_circle_outline_24"
           app:iconGravity="textStart"
           app:iconSize="@dimen/icon_button_size"
           app:iconTint="?attr/colorControlNormal"
@@ -110,7 +109,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:barrierDirection="bottom"
-          app:constraint_referenced_ids="content, video" />
+          app:constraint_referenced_ids="content, attachment" />
 
       <com.google.android.material.button.MaterialButton
           android:id="@+id/views"

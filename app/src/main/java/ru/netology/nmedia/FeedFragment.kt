@@ -18,6 +18,7 @@ import ru.netology.nmedia.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInterractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
+import ru.netology.nmedia.enum.AttachmentType
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.viewModel.PostViewModel
 
@@ -68,11 +69,21 @@ class FeedFragment : Fragment() {
             }
 
             override fun onPlayMedia(post: Post) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.url))
-                if (packageManager?.let { intent.resolveActivity(it) } != null) {
-                    startActivity(intent)
-                } else {
-                    Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT).show()
+                when (post.attachment?.type) {
+                    AttachmentType.IMAGE -> findNavController().navigate(
+                            R.id.action_feedFragment_to_imageFragment,
+                            Bundle().apply {
+                                textArg = post.attachment.url
+                                postArg = post
+                            })
+                    else -> {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.attachment?.url))
+                        if (packageManager?.let { intent.resolveActivity(it) } != null) {
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
 
@@ -86,12 +97,13 @@ class FeedFragment : Fragment() {
         })
 
         binding.postsList.adapter = adapter
-        viewModel.data.observe(viewLifecycleOwner, { state ->
-            adapter.submitList(state.posts)
-            binding.progress.isVisible = state.loading
-            binding.errorGroup.isVisible = state.error
-            binding.emptyText.isVisible = state.empty
-        })
+        viewModel.data.observe(viewLifecycleOwner,
+                { state ->
+                    adapter.submitList(state.posts)
+                    binding.progress.isVisible = state.loading
+                    binding.errorGroup.isVisible = state.error
+                    binding.emptyText.isVisible = state.empty
+                })
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()
@@ -99,7 +111,7 @@ class FeedFragment : Fragment() {
 
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadPosts()
-            binding.swipeRefresh.isRefreshing = false                
+            binding.swipeRefresh.isRefreshing = false
         }
 
         binding.add.setOnClickListener {

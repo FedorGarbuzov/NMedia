@@ -14,7 +14,7 @@
         android:layout_height="@dimen/avatarSize"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@sample/postAvatar" />
+        tools:srcCompat="@sample/posts.json/data/authorAvatar" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/postMenu"
@@ -74,14 +74,14 @@
         app:layout_constraintTop_toBottomOf="@id/barrier"
         tools:text="@sample/posts.json/data/content" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/video"
+    <ImageView
+        android:id="@+id/attachment"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="250dp"
         app:layout_constraintTop_toBottomOf="@id/content"
         app:layout_constraintBottom_toTopOf="@id/barrierBottom"
-        android:background="@drawable/video_background"
-        android:layout_margin="@dimen/spacing"
+        android:background="@android:color/transparent"
+        android:layout_margin="@dimen/halfSpacing"
         app:icon="@drawable/ic_baseline_play_circle_outline_24"
         app:iconGravity="textStart"
         android:checkable="true"

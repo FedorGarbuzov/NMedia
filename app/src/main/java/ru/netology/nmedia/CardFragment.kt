@@ -7,13 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.NewPostFragment.Companion.postArg
 import ru.netology.nmedia.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentCardBinding
+import ru.netology.nmedia.enum.AttachmentType
 import ru.netology.nmedia.util.AndroidUtils.display
 import ru.netology.nmedia.viewModel.PostViewModel
 
@@ -25,7 +30,7 @@ class CardFragment : Fragment() {
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
-            savedInstanceState: Bundle?
+            savedInstanceState: Bundle?,
     ): View? {
         val binding = FragmentCardBinding.inflate(inflater, container, false)
 
@@ -38,8 +43,7 @@ class CardFragment : Fragment() {
                     share.text = display(it.share)
                     favorite.text = display(it.likes)
                     views.text = display(it.views)
-                    video.text = it.url
-                    if (it.url == null) video.visibility = View.GONE
+                    if (it.attachment?.url == null) attachment.visibility = View.GONE
 
                     favorite.isChecked = it.likedByMe
 
@@ -67,13 +71,45 @@ class CardFragment : Fragment() {
                             }
                         }.show()
                     }
-                    video.setOnClickListener { _ ->
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.url))
-                        startActivity(intent)
+
+                    val url = "http://10.0.2.2:9999/avatars/${it.authorAvatar}"
+                    Glide.with(binding.postAvatar)
+                            .load(url)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .timeout(10_000)
+                            .circleCrop()
+                            .into(binding.postAvatar)
+
+                    val attUrl = "http://10.0.2.2:9999/images/${it.attachment?.url}"
+                    Glide.with(binding.attachment)
+                            .load(attUrl)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .timeout(10_000)
+                            .into(binding.attachment)
+                }
+
+                binding.attachment.setOnClickListener { _ ->
+                    when (it?.attachment?.type) {
+                        AttachmentType.IMAGE -> findNavController().navigate(
+                                R.id.action_cardFragment_to_imageFragment,
+                                Bundle().apply {
+                                    textArg = it.attachment.url
+                                })
+                        else -> {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it?.attachment?.url))
+                            if (activity?.packageManager?.let { intent.resolveActivity(it) } != null) {
+                                startActivity(intent)
+                            } else {
+                                Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             }
         }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             findNavController().popBackStack()
         }

@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import ru.netology.nmedia.CardFragment
+import ru.netology.nmedia.databinding.FragmentCardBinding
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.FeedModel
@@ -14,16 +16,17 @@ import java.io.IOException
 import kotlin.concurrent.thread
 
 val emptyPost = Post(
-    id = 0L,
-    author = "",
-    authorAvatar = "",
-    published = "",
-    content = "",
-    share = 0,
-    likes = 0,
-    views = 0,
-    url = null,
-    likedByMe = false
+        id = 0L,
+        author = "",
+        authorAvatar = "",
+        published = "",
+        content = "",
+        share = 0,
+        likes = 0,
+        views = 0,
+        url = null,
+        likedByMe = false,
+        attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
