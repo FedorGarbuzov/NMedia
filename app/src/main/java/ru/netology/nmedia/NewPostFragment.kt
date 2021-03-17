@@ -49,7 +49,7 @@ class NewPostFragment : Fragment() {
             viewModel.save()
             AndroidUtils.hideKeyboard(requireView())
             viewModel.loadPosts()
-            findNavController().navigate(R.id.feedFragment)
+//            findNavController().navigate(R.id.feedFragment)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {

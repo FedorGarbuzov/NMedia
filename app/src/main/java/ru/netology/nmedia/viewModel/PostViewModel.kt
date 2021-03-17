@@ -1,19 +1,19 @@
 package ru.netology.nmedia.viewModel
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ru.netology.nmedia.CardFragment
-import ru.netology.nmedia.databinding.FragmentCardBinding
-import ru.netology.nmedia.post.Post
-import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.NewPostFragment
+import ru.netology.nmedia.R
 import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
-import java.io.IOException
 import kotlin.concurrent.thread
+
 
 val emptyPost = Post(
         id = 0L,
@@ -44,23 +44,27 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadPosts() {
-        _data.postValue(FeedModel(loading = true))
-        repository.getAllAsync(object : PostRepository.GetAllCallback {
+        _data.value = FeedModel(loading = true)
+        repository.getAllAsync(object : PostRepository.Callback<List<Post>> {
             override fun onSuccess(posts: List<Post>) {
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                _data.value = FeedModel(posts = posts, empty = posts.isEmpty())
             }
 
             override fun onError(e: Exception) {
-                FeedModel(error = true)
+                _data.value = FeedModel(error = true)
             }
         })
     }
 
     fun save() {
         edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.SaveCallback {
-                override fun onSuccess(post: Post) {
+            repository.saveAsync(it, object : PostRepository.Callback<Post> {
+                override fun onSuccess(posts: Post) {
                     _postCreated.postValue(Unit)
+                }
+
+                override fun onError(e: Exception) {
+                    Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
                 }
             })
         }
@@ -80,19 +84,47 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        repository.removeByIdAsync(id, object : PostRepository.RemoveByIdCallback {})
-        loadPosts()
+        repository.removeByIdAsync(id, object : PostRepository.Callback<Unit> {
+            override fun onSuccess(posts: Unit) {
+                super.onSuccess(posts)
+                loadPosts()
+            }
+
+            override fun onError(e: Exception) {
+                Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
+                loadPosts()
+            }
+        })
+
     }
 
-    fun likeByMe(id: Long) {
-        repository.likeByMeAsync(id, object : PostRepository.LikeByMeCallback {})
-        loadPosts()
+    fun likedByMe(id: Long) {
+            repository.likedByMeAsync(id, object : PostRepository.Callback<Post> {
+                override fun onSuccess(posts: Post) {
+                    super.onSuccess(posts)
+                    loadPosts()
+                }
+
+                override fun onError(e: Exception) {
+                    Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
+                    loadPosts()
+                }
+            })
     }
 
 
-    fun unlikeByMe(id: Long) {
-        repository.unlikeByMeAsync(id, object : PostRepository.UnlikeByMeCallback {})
-        loadPosts()
+    fun unlikedByMe(id: Long) {
+        repository.unlikedByMeAsync(id, object : PostRepository.Callback<Post> {
+            override fun onSuccess(posts: Post) {
+                super.onSuccess(posts)
+                loadPosts()
+            }
+
+            override fun onError(e: Exception) {
+                Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
+                loadPosts()
+            }
+        })
     }
 
     fun likeById(id: Long) = thread { repository.likeById(id) }
