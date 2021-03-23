@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ru.netology.nmedia.NewPostFragment
 import ru.netology.nmedia.R
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.post.Post
@@ -13,7 +12,6 @@ import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
 import kotlin.concurrent.thread
-
 
 val emptyPost = Post(
         id = 0L,
@@ -31,7 +29,7 @@ val emptyPost = Post(
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository = PostRepositoryImp()
-    private val _data = MutableLiveData<FeedModel>()
+    private val _data = MutableLiveData(FeedModel())
     val data: LiveData<FeedModel>
         get() = _data
     private val edited = MutableLiveData(emptyPost)
@@ -60,7 +58,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             repository.saveAsync(it, object : PostRepository.Callback<Post> {
                 override fun onSuccess(posts: Post) {
-                    _postCreated.postValue(Unit)
+                    _postCreated.value = Unit
+                    loadPosts()
                 }
 
                 override fun onError(e: Exception) {
@@ -95,7 +94,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 loadPosts()
             }
         })
-
     }
 
     fun likedByMe(id: Long) {

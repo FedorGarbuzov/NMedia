@@ -36,6 +36,7 @@ class PostRepositoryImp : PostRepository {
             ) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
+                    return
                 }
                 callback.onSuccess(post)
             }
@@ -54,6 +55,7 @@ class PostRepositoryImp : PostRepository {
             ) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
+                    return
                 }
                 response.body()?.let { callback.onSuccess(it) }
             }
@@ -72,6 +74,7 @@ class PostRepositoryImp : PostRepository {
             ) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
+                    return
                 }
                 response.body()?.let { callback.onSuccess(it) }
             }
@@ -98,6 +101,7 @@ class PostRepositoryImp : PostRepository {
             ) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
+                    return
                 }
                 callback.onSuccess(Unit)
             }
