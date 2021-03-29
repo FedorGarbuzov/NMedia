@@ -111,7 +111,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().saveAsync(content, object : PostRepository.SaveCallback{})
+        getRepository().saveAsync(content, object : PostRepository.Callback<Post>{})
     }
 
     private fun handleMessage(message: RemoteMessage) {

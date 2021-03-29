@@ -4,46 +4,17 @@ import okhttp3.Callback
 import ru.netology.nmedia.post.Post
 
 interface PostRepository {
-//    fun getAll(): List<Post>
-//    fun likeByMe(id: Long)
-//    fun unlikeByMe(id: Long)
     fun likeById(id: Long)
-//    fun save(post: Post)
     fun shareById(id: Long)
-//    fun removeById(id: Long)
+    fun saveAsync(post: Post, callback: Callback<Post>)
+    fun getAllAsync(callback: Callback<List<Post>>)
+    fun removeByIdAsync(id: Long, callback: Callback<Unit>)
+    fun likedByMeAsync(id: Long, callback: Callback<Post>)
+    fun unlikedByMeAsync(id: Long, callback: Callback<Post>)
 
-    fun saveAsync(post: Post, callback: SaveCallback)
-
-    interface SaveCallback {
-        fun onSuccess(post: Post) {}
+    interface Callback<T> {
+        fun onSuccess(posts: T) {}
         fun onError(e: Exception) {}
     }
 
-    fun getAllAsync(callback: GetAllCallback)
-
-    interface GetAllCallback {
-        fun onSuccess(posts: List<Post>) {}
-        fun onError(e: Exception) {}
-    }
-
-    fun removeByIdAsync(id: Long, callback: RemoveByIdCallback)
-
-    interface RemoveByIdCallback {
-        fun onSuccess(id: Long) {}
-        fun onError(e: Exception) {}
-    }
-
-    fun likeByMeAsync(id: Long, callback: LikeByMeCallback)
-
-    interface LikeByMeCallback {
-        fun onSuccess(id: Long) {}
-        fun onError(e: Exception) {}
-    }
-
-    fun unlikeByMeAsync(id: Long, callback: UnlikeByMeCallback)
-
-    interface UnlikeByMeCallback {
-        fun onSuccess(id: Long) {}
-        fun onError(e: Exception) {}
-    }
 }
