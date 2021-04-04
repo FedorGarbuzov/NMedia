@@ -5,29 +5,31 @@ import android.os.Parcelable
 import ru.netology.nmedia.enum.AttachmentType
 
 data class Post(
-        val id: Long,
-        val author: String,
-        val authorAvatar: String,
-        val published: String,
-        val content: String,
-        val share: Int,
-        val likes: Int,
-        val views: Int,
-        val url: String?,
-        val likedByMe: Boolean = false,
-        val attachment: Attachment? = null
+    val id: Long,
+    val author: String,
+    val authorAvatar: String,
+    val published: String,
+    val content: String,
+    val share: Int,
+    val likes: Int,
+    val views: Int,
+    val url: String?,
+    val likedByMe: Boolean = false,
+    val uploadedToServer: Boolean,
+    val attachment: Attachment? = null,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readLong(),
-            parcel.readString().toString(),
-            parcel.readString().toString(),
-            parcel.readString().toString(),
-            parcel.readString().toString(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readString(),
-            parcel.readByte() != 0.toByte()
+        parcel.readLong(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readString(),
+        parcel.readByte() != 0.toByte(),
+        parcel.readByte() != 0.toByte()
     )
 
     override fun describeContents(): Int {
@@ -45,6 +47,7 @@ data class Post(
         parcel.writeInt(views)
         parcel.writeString(url)
         parcel.writeByte(if (likedByMe) 1 else 0)
+        parcel.writeByte(if (uploadedToServer) 1 else 0)
     }
 
     companion object CREATOR : Parcelable.Creator<Post> {
@@ -59,7 +62,7 @@ data class Post(
 }
 
 data class Attachment(
-        val url: String,
-        val description: String,
-        val type: AttachmentType
+    val url: String,
+    val description: String,
+    val type: AttachmentType,
 )

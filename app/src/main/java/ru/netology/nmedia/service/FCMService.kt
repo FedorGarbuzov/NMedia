@@ -6,13 +6,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import kotlinx.coroutines.MainScope
 import ru.netology.nmedia.AppActivity
 import ru.netology.nmedia.R
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImp
@@ -23,6 +26,7 @@ class FCMService : FirebaseMessagingService() {
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+    private val scope = MainScope()
 
     override fun onCreate() {
         super.onCreate()
@@ -41,12 +45,28 @@ class FCMService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         try {
             when (message.data[action]?.let { Action.valueOf(it) }) {
-                Action.LIKE -> handleLike(gson.fromJson(message.data[content], RemoteClass::class.java))
-                Action.SHARE -> handleShare(gson.fromJson(message.data[content], RemoteClass::class.java))
+                Action.LIKE ->
+                    handleLike(
+                            gson.fromJson(
+                                    message.data[content],
+                                    RemoteClass::class.java
+                            )
+                    )
+
+                Action.SHARE ->
+                    handleShare(
+                            gson.fromJson(
+                                    message.data[content],
+                                    RemoteClass::class.java
+                            )
+                    )
+
                 Action.POST -> handlePost(gson.fromJson(message.data[content], Post::class.java))
+
                 else -> handleMessage(message)
             }
-        } catch (e: IllegalArgumentException) {}
+        } catch (e: IllegalArgumentException) {
+        }
     }
 
     override fun onNewToken(token: String) {
@@ -70,7 +90,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().likeById(content.postId)
+//        getRepository().likeById(content.postId)
     }
 
     private fun handleShare(content: RemoteClass) {
@@ -90,7 +110,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().shareById(content.postId)
+//        getRepository().shareById(content.postId)
     }
 
     private fun handlePost(content: Post) {
@@ -111,7 +131,8 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().saveAsync(content, object : PostRepository.Callback<Post>{})
+//        getRepository().save(content)
+
     }
 
     private fun handleMessage(message: RemoteMessage) {
@@ -129,9 +150,9 @@ class FCMService : FirebaseMessagingService() {
                 .notify(Random.nextInt(100_000), notification)
     }
 
-    private fun getRepository(): PostRepository {
-        return PostRepositoryImp()
-    }
+//    private fun getRepository(): PostRepository {
+//        return PostRepositoryImp(AppDb.getInstance(context = application).postDao())
+//    }
 
     private fun getPendingIntent(): PendingIntent {
         val intent = Intent(this, AppActivity::class.java)

@@ -5,8 +5,12 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import retrofit2.http.POST
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.post.Post
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -15,36 +19,54 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun getAll(): LiveData<List<PostEntity>>
 
-    @Insert
-    fun insert(post: PostEntity)
+    @Query("SELECT COUNT(*) == 0 FROM PostEntity")
+    suspend fun isEmpty(): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(post: PostEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(posts: List<PostEntity>)
 
     @Query("UPDATE PostEntity SET content = :content WHERE id = :id")
-    fun updateContentById(content: String, id: Long)
+    suspend fun updateContentById(content: String, id: Long)
+
+    @Query("SELECT MAX(id) FROM PostEntity")
+    fun getId(): Long
 
     @Query("""
         UPDATE PostEntity SET
-        likes = likes + CASE WHEN likedByMe THEN -1 ELSE 1 END,
-        likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
+        likes = likes +1,
+        likedByMe = 1
         WHERE id = :id
 """)
-    fun likeByMe(id: Long)
+    suspend fun likedByMe(id: Long)
+
+    @Query("""
+        UPDATE PostEntity SET
+        likes = likes -1,
+        likedByMe = 0
+        WHERE id = :id
+""")
+    suspend fun unlikedByMe(id: Long)
 
     @Query("""
         UPDATE PostEntity SET
         likes = likes + 1
         WHERE id = :id
     """)
-    fun likeById(id: Long)
+    suspend fun likeById(id: Long)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun save(post: PostEntity) {
-        if (post.id == 0L) insert(
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun save(post: PostEntity) {
+        insert(
             post.copy(author = if(post.author == "") "Me" else post.author,
                 published = LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("dd MMMM в HH:mm")
                 )
             )
-        ) else updateContentById(post.content, post.id)
+        )
     }
 
     @Query("""
@@ -52,8 +74,8 @@ interface PostDao {
         share = share + 1
         WHERE id = :id
     """)
-    fun shareById(id: Long)
+    suspend fun shareById(id: Long)
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
-    fun removeById(id: Long)
+    suspend fun removeById(id: Long)
 }

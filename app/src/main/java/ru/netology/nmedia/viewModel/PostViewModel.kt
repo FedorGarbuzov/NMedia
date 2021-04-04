@@ -2,36 +2,39 @@ package ru.netology.nmedia.viewModel
 
 import android.app.Application
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
-import kotlin.concurrent.thread
 
 val emptyPost = Post(
-        id = 0L,
-        author = "",
-        authorAvatar = "",
-        published = "",
-        content = "",
-        share = 0,
-        likes = 0,
-        views = 0,
-        url = null,
-        likedByMe = false,
-        attachment = null
+    id = 0L,
+    author = "",
+    authorAvatar = "",
+    published = "",
+    content = "",
+    share = 0,
+    likes = 0,
+    views = 0,
+    url = null,
+    likedByMe = false,
+    uploadedToServer = false,
+    attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: PostRepository = PostRepositoryImp()
-    private val _data = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel>
-        get() = _data
+    private val repository: PostRepository =
+        PostRepositoryImp(AppDb.getInstance(context = application).postDao())
+    val data: LiveData<FeedModel> = repository.data.map(::FeedModel)
+    private val _dataState = MutableLiveData<FeedModelState>()
+    val dataState: LiveData<FeedModelState>
+        get() = _dataState
     private val edited = MutableLiveData(emptyPost)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
@@ -41,33 +44,29 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         loadPosts()
     }
 
-    fun loadPosts() {
-        _data.value = FeedModel(loading = true)
-        repository.getAllAsync(object : PostRepository.Callback<List<Post>> {
-            override fun onSuccess(posts: List<Post>) {
-                _data.value = FeedModel(posts = posts, empty = posts.isEmpty())
-            }
-
-            override fun onError(e: Exception) {
-                _data.value = FeedModel(error = true)
-            }
-        })
+    fun loadPosts() = viewModelScope.launch {
+        try {
+            _dataState.value = FeedModelState(loading = true)
+            repository.getAll()
+            _dataState.value = FeedModelState()
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(errorLoading = true)
+        }
     }
 
     fun save() {
         edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.Callback<Post> {
-                override fun onSuccess(posts: Post) {
-                    _postCreated.value = Unit
+            viewModelScope.launch {
+                try {
+                    repository.save(it)
+                    _dataState.value = FeedModelState()
                     loadPosts()
+                } catch (e: Exception) {
+                    _dataState.value = FeedModelState(errorSaving = true)
                 }
-
-                override fun onError(e: Exception) {
-                    Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
-                }
-            })
+            }
+            _postCreated.value = Unit
         }
-        edited.value = emptyPost
     }
 
     fun edit(post: Post) {
@@ -83,48 +82,44 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        repository.removeByIdAsync(id, object : PostRepository.Callback<Unit> {
-            override fun onSuccess(posts: Unit) {
-                super.onSuccess(posts)
+        viewModelScope.launch {
+            try {
+                repository.removeById(id)
+                _dataState.value = FeedModelState()
                 loadPosts()
-            }
-
-            override fun onError(e: Exception) {
+            } catch (e: Exception) {
                 Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
                 loadPosts()
             }
-        })
+        }
     }
 
     fun likedByMe(id: Long) {
-            repository.likedByMeAsync(id, object : PostRepository.Callback<Post> {
-                override fun onSuccess(posts: Post) {
-                    super.onSuccess(posts)
-                    loadPosts()
-                }
-
-                override fun onError(e: Exception) {
-                    Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
-                    loadPosts()
-                }
-            })
-    }
-
-
-    fun unlikedByMe(id: Long) {
-        repository.unlikedByMeAsync(id, object : PostRepository.Callback<Post> {
-            override fun onSuccess(posts: Post) {
-                super.onSuccess(posts)
+        viewModelScope.launch {
+            try {
+                repository.likedByMe(id)
+                _dataState.value = FeedModelState()
                 loadPosts()
-            }
-
-            override fun onError(e: Exception) {
+            } catch (e: Exception) {
                 Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
                 loadPosts()
             }
-        })
+        }
     }
 
-    fun likeById(id: Long) = thread { repository.likeById(id) }
-    fun shareById(id: Long) = thread { repository.shareById(id) }
+    fun unlikedByMe(id: Long) {
+        viewModelScope.launch {
+            try {
+                repository.unlikedByMe(id)
+                _dataState.value = FeedModelState()
+                loadPosts()
+            } catch (e: Exception) {
+                Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
+                loadPosts()
+            }
+        }
+    }
+
+    fun likeById(id: Long) = viewModelScope.launch { repository.likeById(id) }
+    fun shareById(id: Long) = viewModelScope.launch { repository.shareById(id) }
 }
