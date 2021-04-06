@@ -72,6 +72,13 @@ class CardFragment : Fragment() {
                         }.show()
                     }
 
+                    done.isEnabled = it.uploadedToServer
+
+                    if(!done.isEnabled) {
+                        favorite.isClickable = false
+                        share.isClickable = false
+                    }
+
                     val url = "http://10.0.2.2:9999/avatars/${it.authorAvatar}"
                     Glide.with(binding.postAvatar)
                             .load(url)

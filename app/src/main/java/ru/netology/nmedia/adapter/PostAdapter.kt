@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.button.MaterialButton
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.PostCardBinding
 import ru.netology.nmedia.post.Post
@@ -23,7 +24,7 @@ interface OnInterractionListener {
 }
 
 class PostAdapter(
-        private val onInterractionListener: OnInterractionListener,
+    private val onInterractionListener: OnInterractionListener,
 ) : ListAdapter<Post, PostViewHolder>(PostDiffCallBack()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -38,8 +39,8 @@ class PostAdapter(
 }
 
 class PostViewHolder(
-        private val binding: PostCardBinding,
-        private val onInterractionListener: OnInterractionListener,
+    private val binding: PostCardBinding,
+    private val onInterractionListener: OnInterractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {
         binding.apply {
@@ -78,20 +79,20 @@ class PostViewHolder(
 
             val url = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
             Glide.with(binding.postAvatar)
-                    .load(url)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .circleCrop()
-                    .into(binding.postAvatar)
+                .load(url)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .circleCrop()
+                .into(binding.postAvatar)
 
             val attUrl = "http://10.0.2.2:9999/images/${post.attachment?.url}"
             Glide.with(binding.attachment)
-                    .load(attUrl)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .into(binding.attachment)
+                .load(attUrl)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(binding.attachment)
 
             favorite.setOnClickListener {
                 onInterractionListener.onLike(post)
@@ -107,6 +108,12 @@ class PostViewHolder(
 
             binding.root.setOnClickListener {
                 onInterractionListener.onOpenCard(post)
+            }
+            done?.isEnabled = post.uploadedToServer
+
+            if(done?.isEnabled == false) {
+                favorite.isClickable = false
+                share.isClickable = false
             }
         }
     }

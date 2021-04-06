@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -97,16 +98,26 @@ class FeedFragment : Fragment() {
         })
 
         binding.postsList.adapter = adapter
+        viewModel.dataState.observe(viewLifecycleOwner,
+                { state ->
+                    binding.progress.isVisible = state.loading
+                    binding.errorLoadingGroup.isVisible = state.errorLoading
+                    binding.errorSavingGroup.isVisible = state.errorSaving
+                    binding.swipeRefresh.isRefreshing = state.refreshing
+                })
+
         viewModel.data.observe(viewLifecycleOwner,
                 { state ->
                     adapter.submitList(state.posts)
-                    binding.progress.isVisible = state.loading
-                    binding.errorGroup.isVisible = state.error
                     binding.emptyText.isVisible = state.empty
                 })
 
-        binding.retryButton.setOnClickListener {
+        binding.retryLoadingButton.setOnClickListener {
             viewModel.loadPosts()
+        }
+
+        binding.retrySavingButton.setOnClickListener {
+            viewModel.save()
         }
 
         binding.swipeRefresh.setOnRefreshListener {
@@ -117,6 +128,7 @@ class FeedFragment : Fragment() {
         binding.add.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
+
         return binding.root
     }
 }

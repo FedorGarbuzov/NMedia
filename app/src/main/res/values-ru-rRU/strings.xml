@@ -13,6 +13,7 @@
     <string name="channel_remote_name">Уведомления с сервера</string>
     <string name="channel_remote_description">Уведомления с удалённого сервера</string>
     <string name="error_loading">Что-то пошло не так. Попробуйте позднее</string>
+    <string name="error_saving">Сохранение не удалось. Попробуйте позднее</string>
     <string name="retry_loading">Повторить</string>
     <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
     <string name="close">Закрыть</string>
