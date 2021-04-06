@@ -18,13 +18,14 @@ data class PostEntity(
         val views: Int,
         val url: String?,
         val likedByMe: Boolean,
-        val uploadedToServer: Boolean
+        val uploadedToServer: Boolean,
+        val read: Boolean = true
 ) {
-    fun toPost() = Post(id, author, authorAvatar, published, content, share, likes, views, url, likedByMe, uploadedToServer)
+    fun toPost() = Post(id, author, authorAvatar, published, content, share, likes, views, url, likedByMe, uploadedToServer, read)
 
     companion object {
         fun fromPost(post: Post) =
-                PostEntity(post.id, post.author, post.authorAvatar, post.published, post.content, post.share, post.likes, post.views, post.url, post.likedByMe,  post.uploadedToServer)
+                PostEntity(post.id, post.author, post.authorAvatar, post.published, post.content, post.share, post.likes, post.views, post.url, post.likedByMe,  post.uploadedToServer, post.read)
     }
 }
 

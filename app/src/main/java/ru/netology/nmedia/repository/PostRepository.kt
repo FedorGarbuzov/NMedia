@@ -1,11 +1,13 @@
 package ru.netology.nmedia.repository
 
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import okhttp3.Callback
 import ru.netology.nmedia.post.Post
 
 interface PostRepository {
-    val data: LiveData<List<Post>>
+    val data: Flow<List<Post>>
+    fun getNewerCount(id: Long): Flow<List<Post>>
     suspend fun likeById(id: Long)
     suspend fun shareById(id: Long)
     suspend fun save(post: Post)

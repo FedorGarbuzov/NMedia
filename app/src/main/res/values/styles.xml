@@ -24,4 +24,8 @@
         <item name="rippleColor">@color/black</item>
         <item name="textStartPadding">0dp</item>
     </style>
+
+    <style name="newerTheme" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@drawable/newer_button</item>
+    </style>
 </resources>
