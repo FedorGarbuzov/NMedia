@@ -48,10 +48,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    val newerCount: LiveData<List<Post>> = data.switchMap {
-        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
+    val getNewer: LiveData<List<Post>> = data.switchMap {
+        repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
                 .catch { e -> e.printStackTrace() }
                 .asLiveData()
+    }
+
+    fun loadNewer() = viewModelScope.launch {
+        repository.loadNewer()
     }
 
     init {

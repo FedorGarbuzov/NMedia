@@ -113,11 +113,12 @@ class FeedFragment : Fragment() {
                     binding.emptyText.isVisible = state.empty
                 })
 
-        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
+            println(state)
             if (state.isNotEmpty()) {
                 binding.newer.visibility = View.VISIBLE
                 binding.newer.setOnClickListener {
-                    viewModel.loadPosts()
+                    viewModel.loadNewer()
                     binding.newer.visibility = View.GONE
                 }
             }

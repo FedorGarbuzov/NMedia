@@ -1,5 +1,6 @@
 package ru.netology.nmedia.repository
 
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -20,7 +21,7 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
             .map(List<PostEntity>::toPost)
             .flowOn(Dispatchers.Default)
 
-    override fun getNewerCount(id: Long): Flow<List<Post>> = flow {
+    override fun getNewer(id: Long): Flow<List<Post>> = flow {
         while (true) {
             delay(10_000L)
             val response = PostsApi.retrofitService.getNewer(id)
@@ -29,15 +30,19 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            val unread = body.map {
-                it.copy(read = false)
-            }
-            dao.insert(unread.fromPost())
+            dao.insert(body.fromPost())
             emit(body)
         }
     }
             .catch { e -> throw AppError.from(e) }
             .flowOn(Dispatchers.Default)
+
+    override suspend fun loadNewer() {
+        val newer = dao.getNewer()
+        dao.insert(newer.map {
+            it.copy(uploadedToServer = true, read = true)
+        })
+    }
 
     override suspend fun getAll() {
         try {
@@ -56,8 +61,6 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
             throw UnknownError
         }
     }
-
-
 
     override suspend fun save(post: Post) {
         val old = data
@@ -179,5 +182,3 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
         }
     }
 }
-
-

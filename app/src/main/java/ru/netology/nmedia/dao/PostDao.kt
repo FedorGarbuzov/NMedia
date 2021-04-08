@@ -16,6 +16,9 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE read == 1 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
 
+    @Query("SELECT * FROM PostEntity WHERE read == 0 ORDER BY id DESC")
+    suspend fun getNewer(): List<PostEntity>
+
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
 
