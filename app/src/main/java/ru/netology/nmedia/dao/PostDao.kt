@@ -2,22 +2,22 @@ package ru.netology.nmedia.dao
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import retrofit2.http.POST
-import ru.netology.nmedia.db.AppDb
+import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.entity.PostEntity
-import ru.netology.nmedia.post.Post
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
-    fun getAll(): LiveData<List<PostEntity>>
+    @Query("SELECT * FROM PostEntity WHERE read == 1 ORDER BY id DESC")
+    fun getAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * FROM PostEntity WHERE read == 0 ORDER BY id DESC")
+    suspend fun getNewer(): List<PostEntity>
 
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean

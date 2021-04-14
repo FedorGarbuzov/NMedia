@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.NewPostFragment.Companion.postArg
 import ru.netology.nmedia.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInterractionListener
@@ -31,7 +32,7 @@ class FeedFragment : Fragment() {
     val Fragment.packageManager: PackageManager?
         get() = context?.packageManager
 
-    @SuppressLint("ResourceType", "ShowToast")
+    @SuppressLint("ResourceType", "ShowToast", "SetTextI18n")
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -111,6 +112,27 @@ class FeedFragment : Fragment() {
                     adapter.submitList(state.posts)
                     binding.emptyText.isVisible = state.empty
                 })
+
+        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
+            println(state)
+            if (state.isNotEmpty()) {
+                binding.newer.visibility = View.VISIBLE
+                binding.newer.setOnClickListener {
+                    viewModel.loadNewer()
+                    binding.newer.visibility = View.GONE
+                }
+            }
+        }
+
+        adapter.registerAdapterDataObserver( object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(
+                    positionStart: Int,
+                    itemCount: Int
+            ) {
+                binding.postsList.scrollToPosition(0)
+            }
+        })
+
 
         binding.retryLoadingButton.setOnClickListener {
             viewModel.loadPosts()

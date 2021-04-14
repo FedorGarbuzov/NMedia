@@ -8,167 +8,166 @@
     android:padding="@dimen/spacing"
     tools:context=".CardFragment">
 
-  <ImageView
-      android:id="@+id/postAvatar"
-      android:layout_width="@dimen/avatarSize"
-      android:layout_height="@dimen/avatarSize"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      tools:srcCompat="@sample/posts.json/data/authorAvatar" />
+    <ImageView
+        android:id="@+id/postAvatar"
+        android:layout_width="@dimen/avatarSize"
+        android:layout_height="@dimen/avatarSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@sample/posts.json/data/authorAvatar" />
 
-  <com.google.android.material.button.MaterialButton
-      android:id="@+id/postMenu"
-      style="@style/defaultButtonTheme"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@android:color/transparent"
-      android:paddingStart="@dimen/spacing"
-      android:paddingTop="0dp"
-      app:icon="@drawable/ic_baseline_more_vert_24"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent">
-  </com.google.android.material.button.MaterialButton>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/postMenu"
+        style="@style/defaultButtonTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:paddingStart="@dimen/spacing"
+        android:paddingTop="0dp"
+        app:icon="@drawable/ic_baseline_more_vert_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></com.google.android.material.button.MaterialButton>
 
-  <TextView
-      android:id="@+id/userName"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/spacing"
-      android:layout_marginEnd="@dimen/spacing"
-      android:ellipsize="end"
-      android:singleLine="true"
-      app:layout_constraintBottom_toTopOf="@+id/published"
-      app:layout_constraintEnd_toStartOf="@+id/postMenu"
-      app:layout_constraintStart_toEndOf="@+id/postAvatar"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_chainStyle="packed"
-      tools:text="@sample/posts.json/data/author" />
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing"
+        android:layout_marginEnd="@dimen/spacing"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintBottom_toTopOf="@+id/published"
+        app:layout_constraintEnd_toStartOf="@+id/postMenu"
+        app:layout_constraintStart_toEndOf="@+id/postAvatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@sample/posts.json/data/author" />
 
-  <TextView
-      android:id="@+id/published"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/spacing"
-      app:layout_constraintBottom_toTopOf="@+id/barrier"
-      app:layout_constraintStart_toEndOf="@+id/postAvatar"
-      app:layout_constraintTop_toBottomOf="@+id/userName"
-      tools:text="@sample/posts.json/data/published" />
+    <TextView
+        android:id="@+id/published"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing"
+        app:layout_constraintBottom_toTopOf="@+id/barrier"
+        app:layout_constraintStart_toEndOf="@+id/postAvatar"
+        app:layout_constraintTop_toBottomOf="@+id/userName"
+        tools:text="@sample/posts.json/data/published" />
 
-  <androidx.constraintlayout.widget.Barrier
-      android:id="@+id/barrier"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:barrierDirection="bottom"
-      app:constraint_referenced_ids="postAvatar, postMenu, userName, published" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="postAvatar, postMenu, userName, published" />
 
-  <ScrollView
-      android:id="@+id/scroll"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:paddingTop="@dimen/spacing"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/barrier">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing"
-        tools:context=".CardFragment">
+        android:paddingTop="@dimen/spacing"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier">
 
-      <TextView
-          android:id="@+id/content"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintBottom_toTopOf="@id/attachment"
-          android:autoLink="web"
-          android:lineSpacingExtra="@dimen/spacing"
-          tools:layout_editor_absoluteX="16dp"
-          tools:layout_editor_absoluteY="16dp"
-          tools:text="@sample/posts.json/data/content" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing"
+            tools:context=".CardFragment">
 
-      <com.google.android.material.button.MaterialButton
-          android:id="@+id/done"
-          style="@style/defaultButtonTheme"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:background="@android:color/transparent"
-          android:checkable="true"
-          app:icon="@drawable/ic_done_selector"
-          android:paddingStart="@dimen/spacing"
-          app:iconPadding="@dimen/halfSpacing"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintBottom_toTopOf="@id/views" />
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:lineSpacingExtra="@dimen/spacing"
+                app:layout_constraintBottom_toTopOf="@id/attachment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="16dp"
+                tools:text="@sample/posts.json/data/content" />
 
-      <ImageView
-          android:id="@+id/attachment"
-          android:layout_width="match_parent"
-          android:layout_height="250dp"
-          android:layout_margin="@dimen/halfSpacing"
-          android:background="@android:color/transparent"
-          android:checkable="true"
-          app:iconGravity="textStart"
-          app:iconSize="@dimen/icon_button_size"
-          app:iconTint="?attr/colorControlNormal"
-          app:layout_constraintTop_toBottomOf="@+id/content" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/done"
+                style="@style/defaultButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:paddingStart="@dimen/spacing"
+                app:icon="@drawable/ic_done_selector"
+                app:iconPadding="@dimen/halfSpacing"
+                app:layout_constraintBottom_toTopOf="@id/views"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-      <androidx.constraintlayout.widget.Barrier
-          android:id="@+id/barrierBottom"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          app:barrierDirection="bottom"
-          app:constraint_referenced_ids="content, attachment"
-          tools:layout_editor_absoluteX="16dp"
-          tools:layout_editor_absoluteY="620dp" />
+            <ImageView
+                android:id="@+id/attachment"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_margin="@dimen/halfSpacing"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                app:iconGravity="textStart"
+                app:iconSize="@dimen/icon_button_size"
+                app:iconTint="?attr/colorControlNormal"
+                app:layout_constraintTop_toBottomOf="@+id/content" />
 
-      <com.google.android.material.button.MaterialButton
-          android:id="@+id/views"
-          style="@style/defaultButtonTheme"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:background="@android:color/transparent"
-          android:textColor="?attr/colorControlNormal"
-          app:icon="@drawable/ic_baseline_visibility_24"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_chainStyle="packed"
-          app:layout_constraintTop_toBottomOf="@id/barrierBottom"
-          tools:text="@sample/posts.json/data/views" />
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="content, attachment"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="620dp" />
 
-      <com.google.android.material.button.MaterialButton
-          android:id="@+id/favorite"
-          style="@style/likeButtonTheme"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:background="@android:color/transparent"
-          android:checkable="true"
-          android:textColor="?attr/colorControlNormal"
-          app:icon="@drawable/ic_favorite_selector"
-          app:iconPadding="@dimen/halfSpacing"
-          app:layout_constraintHorizontal_chainStyle="packed"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/barrierBottom"
-          tools:text="@sample/posts.json/data/likes" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/views"
+                style="@style/defaultButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:textColor="?attr/colorControlNormal"
+                app:icon="@drawable/ic_baseline_visibility_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintTop_toBottomOf="@id/barrierBottom"
+                tools:text="@sample/posts.json/data/views" />
 
-      <com.google.android.material.button.MaterialButton
-          android:id="@+id/share"
-          style="@style/defaultButtonTheme"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:background="@android:color/transparent"
-          android:checkable="true"
-          android:textColor="?attr/colorControlNormal"
-          app:icon="@drawable/ic_baseline_share_24"
-          app:layout_constraintStart_toEndOf="@id/favorite"
-          app:layout_constraintTop_toBottomOf="@id/barrierBottom"
-          tools:text="@sample/posts.json/data/share" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/favorite"
+                style="@style/likeButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:textColor="?attr/colorControlNormal"
+                app:icon="@drawable/ic_favorite_selector"
+                app:iconPadding="@dimen/halfSpacing"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrierBottom"
+                tools:text="@sample/posts.json/data/likes" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/share"
+                style="@style/defaultButtonTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:checkable="true"
+                android:textColor="?attr/colorControlNormal"
+                app:icon="@drawable/ic_baseline_share_24"
+                app:layout_constraintStart_toEndOf="@id/favorite"
+                app:layout_constraintTop_toBottomOf="@id/barrierBottom"
+                tools:text="@sample/posts.json/data/share" />
 
-  </ScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

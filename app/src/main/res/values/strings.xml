@@ -14,6 +14,7 @@
     <string name="channel_remote_description">Notifications from remote server</string>
     <string name="error_loading">Something went wrong. Try again later</string>
     <string name="error_saving">Saving failed. Try again later</string>
+    <string name="latest_news">Latest news</string>
     <string name="retry_loading">Retry</string>
     <string name="empty_posts">There are no posts.\nIf you create a new post, it will appear here</string>
     <string name="close">Close</string>

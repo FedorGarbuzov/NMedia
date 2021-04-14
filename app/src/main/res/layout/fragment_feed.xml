@@ -7,12 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".FeedFragment">
 
+    <Button
+        android:id="@+id/newer"
+        style="@style/newerTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/latest_news"
+        android:visibility="gone"
+        app:icon="@drawable/ic_baseline_arrow_upward_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/postsList"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -38,8 +50,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/spacing"
-        android:text="@string/error_loading"
         android:background="@color/white"
+        android:text="@string/error_loading"
         app:layout_constraintBottom_toTopOf="@+id/retryLoadingButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,8 +79,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/spacing"
-        android:text="@string/error_saving"
         android:background="@color/white"
+        android:text="@string/error_saving"
         app:layout_constraintBottom_toTopOf="@+id/retrySavingButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

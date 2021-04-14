@@ -16,6 +16,7 @@ data class Post(
     val url: String?,
     val likedByMe: Boolean = false,
     val uploadedToServer: Boolean,
+    val read: Boolean = true,
     val attachment: Attachment? = null,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(

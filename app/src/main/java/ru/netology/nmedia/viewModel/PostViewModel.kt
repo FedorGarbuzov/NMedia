@@ -3,6 +3,9 @@ package ru.netology.nmedia.viewModel
 import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.db.AppDb
@@ -14,24 +17,29 @@ import ru.netology.nmedia.repository.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
 
 val emptyPost = Post(
-    id = 0L,
-    author = "",
-    authorAvatar = "",
-    published = "",
-    content = "",
-    share = 0,
-    likes = 0,
-    views = 0,
-    url = null,
-    likedByMe = false,
-    uploadedToServer = false,
-    attachment = null
+        id = 0L,
+        author = "",
+        authorAvatar = "",
+        published = "",
+        content = "",
+        share = 0,
+        likes = 0,
+        views = 0,
+        url = null,
+        likedByMe = false,
+        uploadedToServer = false,
+        read = true,
+        attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
-        PostRepositoryImp(AppDb.getInstance(context = application).postDao())
-    val data: LiveData<FeedModel> = repository.data.map(::FeedModel)
+            PostRepositoryImp(AppDb.getInstance(context = application).postDao())
+
+    val data: LiveData<FeedModel> = repository.data
+            .map(::FeedModel)
+            .asLiveData(Dispatchers.Default)
+
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
@@ -39,6 +47,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
+
+    val getNewer: LiveData<List<Post>> = data.switchMap {
+        repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
+                .catch { e -> e.printStackTrace() }
+                .asLiveData()
+    }
+
+    fun loadNewer() = viewModelScope.launch {
+        repository.loadNewer()
+    }
 
     init {
         loadPosts()
