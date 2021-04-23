@@ -11,6 +11,7 @@ import ru.netology.nmedia.entity.PostEntity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+
 @Dao
 interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE read == 1 ORDER BY id DESC")
