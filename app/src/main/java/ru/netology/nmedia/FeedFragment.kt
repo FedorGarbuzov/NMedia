@@ -14,12 +14,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import ru.netology.nmedia.NewPostFragment.Companion.postArg
 //import ru.netology.nmedia.NewPostFragment.Companion.postArg
 import ru.netology.nmedia.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInterractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.enum.AttachmentType
+import ru.netology.nmedia.post.AttachmentType
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.viewModel.PostViewModel
 
@@ -75,7 +76,7 @@ class FeedFragment : Fragment() {
                             R.id.action_feedFragment_to_imageFragment,
                             Bundle().apply {
                                 textArg = post.attachment.url
-//                                postArg = post
+                                postArg = post
                             })
                     else -> {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.attachment?.url))
@@ -92,7 +93,7 @@ class FeedFragment : Fragment() {
                 findNavController().navigate(
                         R.id.action_feedFragment_to_cardFragment,
                         Bundle().apply {
-//                            postArg = post
+                            postArg = post
                         })
             }
         })

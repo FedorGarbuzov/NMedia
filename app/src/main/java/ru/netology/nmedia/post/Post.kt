@@ -2,7 +2,6 @@ package ru.netology.nmedia.post
 
 import android.os.Parcel
 import android.os.Parcelable
-import ru.netology.nmedia.enum.AttachmentType
 
 data class Post(
     val id: Long,

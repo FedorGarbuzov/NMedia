@@ -12,7 +12,7 @@ import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.fromPost
 import ru.netology.nmedia.entity.toPost
-import ru.netology.nmedia.enum.AttachmentType
+import ru.netology.nmedia.post.AttachmentType
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError

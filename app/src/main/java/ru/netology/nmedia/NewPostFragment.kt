@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -71,30 +70,34 @@ class NewPostFragment : Fragment() {
 
         fragmentBinding = binding
 
-        binding.edit.requestFocus()
-
         arguments?.textArg
                 ?.let(binding.edit::setText)
+
+        binding.edit.requestFocus()
 
         binding.pickPhoto.setOnClickListener {
             ImagePicker.with(this)
                     .crop()
                     .compress(2048)
                     .galleryOnly()
-                    .galleryMimeTypes(arrayOf("image/png", "image/jpeg"))
+                    .galleryMimeTypes(arrayOf("image/*"))
                     .start(photoRequestCode)
         }
 
         binding.takePhoto.setOnClickListener {
             ImagePicker.with(this)
                     .crop()
-                    .compress(2018)
+                    .compress(2048)
                     .cameraOnly()
                     .start(cameraRequestCode)
         }
 
         binding.removePhoto.setOnClickListener {
             viewModel.changePhoto(null, null)
+        }
+
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            findNavController().navigateUp()
         }
 
         viewModel.photo.observe(viewLifecycleOwner) {
@@ -105,20 +108,6 @@ class NewPostFragment : Fragment() {
 
             binding.photoContainer.visibility = View.VISIBLE
             binding.photo.setImageURI(it.uri)
-        }
-
-//        binding.ok.setOnClickListener {
-//            viewModel.changeContent(binding.edit.text.toString())
-//            viewModel.save()
-//            AndroidUtils.hideKeyboard(requireView())
-//        }
-
-        viewModel.postCreated.observe(viewLifecycleOwner, {
-            findNavController().navigate(R.id.feedFragment)
-        })
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            findNavController().popBackStack()
         }
 
         return binding.root

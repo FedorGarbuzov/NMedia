@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide
 import ru.netology.nmedia.NewPostFragment.Companion.postArg
 import ru.netology.nmedia.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentCardBinding
-import ru.netology.nmedia.enum.AttachmentType
+import ru.netology.nmedia.post.AttachmentType
 import ru.netology.nmedia.util.AndroidUtils.display
 import ru.netology.nmedia.viewModel.PostViewModel
 
