@@ -2,7 +2,6 @@ package ru.netology.nmedia.post
 
 import android.os.Parcel
 import android.os.Parcelable
-import ru.netology.nmedia.enum.AttachmentType
 
 data class Post(
     val id: Long,
@@ -13,7 +12,6 @@ data class Post(
     val share: Int,
     val likes: Int,
     val views: Int,
-    val url: String?,
     val likedByMe: Boolean = false,
     val uploadedToServer: Boolean,
     val read: Boolean = true,
@@ -28,14 +26,10 @@ data class Post(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
-        parcel.readString(),
+        parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte()
     )
-
-    override fun describeContents(): Int {
-        TODO("Not yet implemented")
-    }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(id)
@@ -46,9 +40,13 @@ data class Post(
         parcel.writeInt(share)
         parcel.writeInt(likes)
         parcel.writeInt(views)
-        parcel.writeString(url)
         parcel.writeByte(if (likedByMe) 1 else 0)
         parcel.writeByte(if (uploadedToServer) 1 else 0)
+        parcel.writeByte(if (read) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
     }
 
     companion object CREATOR : Parcelable.Creator<Post> {
@@ -63,7 +61,6 @@ data class Post(
 }
 
 data class Attachment(
-    val url: String,
-    val description: String,
-    val type: AttachmentType,
+        val url: String,
+        val type: AttachmentType,
 )

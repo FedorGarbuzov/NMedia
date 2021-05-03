@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.android.material.button.MaterialButton
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.PostCardBinding
 import ru.netology.nmedia.post.Post
@@ -93,6 +92,14 @@ class PostViewHolder(
                 .error(R.drawable.ic_error_100dp)
                 .timeout(10_000)
                 .into(binding.attachment)
+
+            val myUrl = "http://10.0.2.2:9999/media/${post.attachment?.url}"
+            Glide.with(binding.attachment)
+                    .load(myUrl)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.attachment)
 
             favorite.setOnClickListener {
                 onInterractionListener.onLike(post)

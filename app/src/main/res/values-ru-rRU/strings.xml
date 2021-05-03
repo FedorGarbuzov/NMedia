@@ -18,4 +18,6 @@
     <string name="retry_loading">Повторить</string>
     <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
     <string name="close">Закрыть</string>
+    <string name="save">Сохранить</string>
+    <string name="remove">Удалить</string>
 </resources>

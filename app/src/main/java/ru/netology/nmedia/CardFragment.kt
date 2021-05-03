@@ -13,12 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.NewPostFragment.Companion.postArg
 import ru.netology.nmedia.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentCardBinding
-import ru.netology.nmedia.enum.AttachmentType
+import ru.netology.nmedia.post.AttachmentType
 import ru.netology.nmedia.util.AndroidUtils.display
 import ru.netology.nmedia.viewModel.PostViewModel
 

@@ -1,6 +1,7 @@
 package ru.netology.nmedia.viewModel
 
 import android.app.Application
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
@@ -9,36 +10,39 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
+import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.File
 
 val emptyPost = Post(
-        id = 0L,
-        author = "",
-        authorAvatar = "",
-        published = "",
-        content = "",
-        share = 0,
-        likes = 0,
-        views = 0,
-        url = null,
-        likedByMe = false,
-        uploadedToServer = false,
-        read = true,
-        attachment = null
+    id = 0L,
+    author = "",
+    authorAvatar = "",
+    published = "",
+    content = "",
+    share = 0,
+    likes = 0,
+    views = 0,
+    likedByMe = false,
+    uploadedToServer = false,
+    read = true
 )
+
+private val noPhoto = PhotoModel()
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
-            PostRepositoryImp(AppDb.getInstance(context = application).postDao())
+        PostRepositoryImp(AppDb.getInstance(context = application).postDao())
 
     val data: LiveData<FeedModel> = repository.data
-            .map(::FeedModel)
-            .asLiveData(Dispatchers.Default)
+        .map(::FeedModel)
+        .asLiveData(Dispatchers.Default)
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
@@ -50,13 +54,17 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     val getNewer: LiveData<List<Post>> = data.switchMap {
         repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
-                .catch { e -> e.printStackTrace() }
-                .asLiveData()
+            .catch { e -> e.printStackTrace() }
+            .asLiveData()
     }
 
     fun loadNewer() = viewModelScope.launch {
         repository.loadNewer()
     }
+
+    private val _photo = MutableLiveData(noPhoto)
+    val photo: LiveData<PhotoModel>
+        get() = _photo
 
     init {
         loadPosts()
@@ -76,7 +84,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             viewModelScope.launch {
                 try {
-                    repository.save(it)
+                    when (_photo.value) {
+                        noPhoto -> repository.save(it)
+                        else -> _photo.value?.file?.let { file ->
+                            repository.saveWithAttachment(it, MediaUpload(file))
+                        }
+                    }
+
                     _dataState.value = FeedModelState()
                     loadPosts()
                 } catch (e: Exception) {
@@ -85,6 +99,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
             _postCreated.value = Unit
         }
+        edited.value = emptyPost
+        _photo.value = noPhoto
     }
 
     fun edit(post: Post) {
@@ -97,6 +113,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         edited.value = edited.value?.copy(content = text)
+    }
+
+    fun changePhoto(uri: Uri?, file: File?) {
+        _photo.value = PhotoModel(uri, file)
     }
 
     fun removeById(id: Long) {

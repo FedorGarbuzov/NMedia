@@ -1,4 +1,4 @@
-package ru.netology.nmedia.enum
+package ru.netology.nmedia.post
 
 enum class AttachmentType {
     IMAGE
