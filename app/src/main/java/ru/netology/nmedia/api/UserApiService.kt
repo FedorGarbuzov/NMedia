@@ -2,6 +2,7 @@ package ru.netology.nmedia.api
 
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -9,8 +10,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.post.Media
-import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.post.Token
+import ru.netology.nmedia.post.User
 
 private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
 
@@ -39,32 +40,27 @@ private val retrofit = Retrofit.Builder()
         .client(okhttp)
         .build()
 
-interface PostsApiService {
-    @GET("posts")
-    suspend fun getAll(): Response<List<Post>>
+interface UsersApiService {
+    @FormUrlEncoded
+    @POST("users/authentication")
+    suspend fun updateUser(@Field("login") login: String, @Field("pass") pass: String): Response<Token>
 
-    @GET("posts/{id}/newer")
-    suspend fun getNewer(@Path("id") id: Long): Response<List<Post>>
-
-    @POST("posts")
-    suspend fun save(@Body post: Post): Response<Post>
-
-    @DELETE("posts/{id}")
-    suspend fun removeById(@Path("id") id: Long): Response<Unit>
-
-    @POST("posts/{id}/likes")
-    suspend fun likedByMe(@Path("id") id: Long): Response<Post>
-
-    @DELETE("posts/{id}/likes")
-    suspend fun unlikedByMe(@Path("id") id: Long): Response<Post>
+    @FormUrlEncoded
+    @POST("users/registration")
+    suspend fun createUser(@Field("login") login: String, @Field("pass") pass: String, @Field("name") name: String): Response<Token>
 
     @Multipart
-    @POST("media")
-    suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
+    @POST("users/registration")
+    suspend fun createWithPhoto(
+            @Part("login") login: RequestBody,
+            @Part("pass") pass: RequestBody,
+            @Part("name") name: RequestBody,
+            @Part media: MultipartBody.Part,
+    ): Response<Token>
 }
 
-object PostsApi {
-    val retrofitService: PostsApiService by lazy {
-        retrofit.create(PostsApiService::class.java)
+object UsersApi {
+    val retrofitService: UsersApiService by lazy {
+        retrofit.create(UsersApiService::class.java)
     }
 }

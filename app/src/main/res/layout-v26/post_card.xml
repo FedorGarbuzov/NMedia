@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/spacing"
-    tools:context=".FeedFragment">
+    tools:context=".ui.FeedFragment">
 
     <ImageView
         android:id="@+id/postAvatar"

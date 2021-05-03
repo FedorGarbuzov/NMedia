@@ -6,19 +6,15 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import kotlinx.coroutines.MainScope
-import ru.netology.nmedia.AppActivity
+import ru.netology.nmedia.ui.AppActivity
 import ru.netology.nmedia.R
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.post.Post
-import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImp
 import kotlin.random.Random
 
 class FCMService : FirebaseMessagingService() {

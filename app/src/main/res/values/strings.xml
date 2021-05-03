@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">NMedia</string>
     <string name="likes">183</string>
     <string name="share">999</string>
@@ -20,4 +20,23 @@
     <string name="close">Close</string>
     <string name="save">Save</string>
     <string name="remove">Remove</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="enter">Enter</string>
+    <string name="registration">Registration</string>
+    <string name="login">Login</string>
+    <string name="userName">Name</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="user_avatar">Avatar</string>
+    <string name="enter_button">Enter</string>
+    <string name="register_button">Register</string>
+    <string name="fields_are_not_the_same">The password and confirm password fields are not the same</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="empty_field">The field cannot be empty</string>
+    <string name="invalid_user">Invalid username or password</string>
+    <string name="cancelation">Are you sure you want to get out?</string>
+    <string name="dialog_positive" translatable="false">OK</string>
+    <string name="dialog_negative" tools:ignore="ButtonCase">CANCEL</string>
 </resources>
