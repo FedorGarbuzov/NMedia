@@ -4,36 +4,40 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Post(
-    val id: Long,
-    val author: String,
-    val authorAvatar: String,
-    val published: String,
-    val content: String,
-    val share: Int,
-    val likes: Int,
-    val views: Int,
-    val likedByMe: Boolean = false,
-    val uploadedToServer: Boolean,
-    val read: Boolean = true,
-    val attachment: Attachment? = null,
+        val id: Long,
+        val author: String,
+        val authorId: Long,
+        val authorAvatar: String,
+        val published: String,
+        val content: String,
+        val share: Int,
+        val likes: Int,
+        val views: Int,
+        val likedByMe: Boolean = false,
+        val uploadedToServer: Boolean,
+        val read: Boolean = true,
+        val attachment: Attachment? = null,
+        val ownedByMe: Boolean = false,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readLong(),
-        parcel.readString().toString(),
-        parcel.readString().toString(),
-        parcel.readString().toString(),
-        parcel.readString().toString(),
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readByte() != 0.toByte(),
-        parcel.readByte() != 0.toByte(),
-        parcel.readByte() != 0.toByte()
+            parcel.readLong(),
+            parcel.readString().toString(),
+            parcel.readLong(),
+            parcel.readString().toString(),
+            parcel.readString().toString(),
+            parcel.readString().toString(),
+            parcel.readInt(),
+            parcel.readInt(),
+            parcel.readInt(),
+            parcel.readByte() != 0.toByte(),
+            parcel.readByte() != 0.toByte(),
+            parcel.readByte() != 0.toByte()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(id)
         parcel.writeString(author)
+        parcel.writeLong(authorId)
         parcel.writeString(authorAvatar)
         parcel.writeString(published)
         parcel.writeString(content)

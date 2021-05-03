@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/spacing"
-    tools:context=".CardFragment">
+    tools:context=".ui.CardFragment">
 
     <ImageView
         android:id="@+id/postAvatar"
@@ -77,7 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/spacing"
-            tools:context=".CardFragment">
+            tools:context=".ui.CardFragment">
 
             <TextView
                 android:id="@+id/content"

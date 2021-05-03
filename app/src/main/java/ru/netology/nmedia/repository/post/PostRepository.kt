@@ -1,8 +1,8 @@
-package ru.netology.nmedia.repository
+package ru.netology.nmedia.repository.post
 
 import kotlinx.coroutines.flow.Flow
-import ru.netology.nmedia.dto.Media
-import ru.netology.nmedia.dto.MediaUpload
+import ru.netology.nmedia.post.Media
+import ru.netology.nmedia.post.MediaUpload
 import ru.netology.nmedia.post.Post
 
 interface PostRepository {

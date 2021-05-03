@@ -39,4 +39,31 @@
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
     </style>
+
+    <style name="title_style">
+        <item name="android:textFontWeight" tools:targetApi="p">
+            500
+        </item>
+        <item name="android:textSize">
+            24sp
+        </item>
+        <item name="android:letterSpacing">
+            0.01
+        </item>
+        <item name="android:textColor">
+            #DE000000
+        </item>
+    </style>
+
+    <style name="enter_button_style">
+        <item name="android:textSize">
+            14sp
+        </item>
+        <item name="android:letterSpacing">
+            0.03
+        </item>
+        <item name="android:textColor">
+            #DE000000
+        </item>
+    </style>
 </resources>

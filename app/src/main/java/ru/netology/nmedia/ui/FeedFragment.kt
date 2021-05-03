@@ -1,37 +1,72 @@
-package ru.netology.nmedia
+package ru.netology.nmedia.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import ru.netology.nmedia.NewPostFragment.Companion.postArg
-//import ru.netology.nmedia.NewPostFragment.Companion.postArg
-import ru.netology.nmedia.NewPostFragment.Companion.textArg
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import ru.netology.nmedia.R
+import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
+import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInterractionListener
 import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.post.AttachmentType
 import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
 
 class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
             ownerProducer = ::requireParentFragment
     )
+    private val authViewModel: AuthViewModel by viewModels()
 
     val Fragment.packageManager: PackageManager?
         get() = context?.packageManager
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+
+        menu.let {
+            it.setGroupVisible(R.id.unauthenticated, !authViewModel.authenticated)
+            it.setGroupVisible(R.id.authenticated, authViewModel.authenticated)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.signin -> {
+                SignInFragment().show(parentFragmentManager, "Dialog")
+                true
+            }
+            R.id.signout -> {
+                AppAuth.getInstance().removeAuth()
+                true
+            }
+            R.id.signup -> {
+                SignUpFragment().show(parentFragmentManager, "Dialog")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    @ExperimentalCoroutinesApi
     @SuppressLint("ResourceType", "ShowToast", "SetTextI18n")
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -43,7 +78,11 @@ class FeedFragment : Fragment() {
 
         val adapter = PostAdapter(object : OnInterractionListener {
             override fun onLike(post: Post) {
-                if (!post.likedByMe) viewModel.likedByMe(post.id) else viewModel.unlikedByMe(post.id)
+                if (authViewModel.authenticated) {
+                    if (!post.likedByMe) viewModel.likedByMe(post.id) else viewModel.unlikedByMe(post.id)
+                } else {
+                    SignInFragment().show(parentFragmentManager, "Dialog")
+                }
             }
 
             override fun onShare(post: Post) {
@@ -114,7 +153,6 @@ class FeedFragment : Fragment() {
                 })
 
         viewModel.getNewer.observe(viewLifecycleOwner) { state ->
-            println(state)
             if (state.isNotEmpty()) {
                 binding.newer.visibility = View.VISIBLE
                 binding.newer.setOnClickListener {
@@ -124,10 +162,10 @@ class FeedFragment : Fragment() {
             }
         }
 
-        adapter.registerAdapterDataObserver( object : RecyclerView.AdapterDataObserver() {
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(
                     positionStart: Int,
-                    itemCount: Int
+                    itemCount: Int,
             ) {
                 binding.postsList.scrollToPosition(0)
             }
@@ -148,7 +186,11 @@ class FeedFragment : Fragment() {
         }
 
         binding.add.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            if (authViewModel.authenticated) {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            } else {
+                SignInFragment().show(parentFragmentManager, "Dialog")
+            }
         }
 
         return binding.root

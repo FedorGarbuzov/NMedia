@@ -1,4 +1,4 @@
-package ru.netology.nmedia.repository
+package ru.netology.nmedia.repository.post
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -7,8 +7,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.PostsApi
 import ru.netology.nmedia.dao.PostDao
-import ru.netology.nmedia.dto.Media
-import ru.netology.nmedia.dto.MediaUpload
+import ru.netology.nmedia.post.Media
+import ru.netology.nmedia.post.MediaUpload
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.fromPost
 import ru.netology.nmedia.entity.toPost

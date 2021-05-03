@@ -12,6 +12,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.PostCardBinding
 import ru.netology.nmedia.post.Post
 import ru.netology.nmedia.util.AndroidUtils.display
+import ru.netology.nmedia.viewModel.AuthViewModel
 
 interface OnInterractionListener {
     fun onLike(post: Post) {}
@@ -56,10 +57,12 @@ class PostViewHolder(
             favorite.text = display(post.likes)
 
             share.text = display(post.share)
+            postMenu.visibility = if (post.ownedByMe) View.VISIBLE else View.INVISIBLE
 
             postMenu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.post_options)
+//                    menu.setGroupVisible(R.id.owned, post.ownedByMe)
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
