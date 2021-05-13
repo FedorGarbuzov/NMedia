@@ -10,35 +10,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.post.Token
-import ru.netology.nmedia.post.User
+import ru.netology.nmedia.dto.PushToken
+import ru.netology.nmedia.dto.Token
 
-private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
-
-private val loggin = HttpLoggingInterceptor().apply {
-    if (BuildConfig.DEBUG) {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
-}
-
-private val okhttp = OkHttpClient.Builder()
-        .addInterceptor(loggin)
-        .addInterceptor { chain ->
-            AppAuth.getInstance().authStateFlow.value.token?.let { token ->
-                val newRequest = chain.request().newBuilder()
-                        .addHeader("Authorization", token)
-                        .build()
-                return@addInterceptor chain.proceed(newRequest)
-            }
-            chain.proceed(chain.request())
-        }
-        .build()
-
-private val retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(BASE_URL)
-        .client(okhttp)
-        .build()
+private val retrofit = RetrofitBuilder().retfofit
 
 interface UsersApiService {
     @FormUrlEncoded
@@ -48,6 +23,9 @@ interface UsersApiService {
     @FormUrlEncoded
     @POST("users/registration")
     suspend fun createUser(@Field("login") login: String, @Field("pass") pass: String, @Field("name") name: String): Response<Token>
+
+    @POST("users/push-tokens")
+    suspend fun savePushToken(@Body pushToken: PushToken): Response<Unit>
 
     @Multipart
     @POST("users/registration")

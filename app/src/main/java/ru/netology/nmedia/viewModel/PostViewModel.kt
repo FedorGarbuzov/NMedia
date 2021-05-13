@@ -13,11 +13,11 @@ import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.post.MediaUpload
+import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.PhotoModel
-import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.post.PostRepository
 import ru.netology.nmedia.repository.post.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent

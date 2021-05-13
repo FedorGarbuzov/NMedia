@@ -31,7 +31,7 @@
     <string name="confirm_password">Подтвердить пароль</string>
     <string name="user_avatar">Аватар</string>
     <string name="enter_button">Войти</string>
-    <string name="register_button">Зарегистироваться</string>
+    <string name="register_button">Регистрация</string>
     <string name="fields_are_not_the_same">Поле пароль и подтвердить пароль не совпадают</string>
     <string name="cancel_button">Отмена</string>
     <string name="empty_field">Поле не может быть пустым</string>

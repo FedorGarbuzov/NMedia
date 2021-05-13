@@ -1,7 +1,7 @@
 package ru.netology.nmedia.repository.user
 
 import okhttp3.RequestBody
-import ru.netology.nmedia.post.MediaUpload
+import ru.netology.nmedia.dto.MediaUpload
 
 interface UserRepository {
     suspend fun updateUser(login: String, pass: String)

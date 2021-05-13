@@ -1,4 +1,4 @@
-package ru.netology.nmedia.post
+package ru.netology.nmedia.dto
 
 data class User(
         var id: Long,

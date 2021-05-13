@@ -15,7 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
-import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel

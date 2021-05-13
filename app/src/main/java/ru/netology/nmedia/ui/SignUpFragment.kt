@@ -80,7 +80,7 @@ class SignUpFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        val width = resources.displayMetrics.widthPixels
         dialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 

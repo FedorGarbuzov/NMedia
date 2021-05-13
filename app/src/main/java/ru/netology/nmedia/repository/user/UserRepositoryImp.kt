@@ -8,9 +8,7 @@ import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
-import ru.netology.nmedia.post.MediaUpload
-import ru.netology.nmedia.post.Token
-import ru.netology.nmedia.post.User
+import ru.netology.nmedia.dto.MediaUpload
 import java.io.IOException
 
 class UserRepositoryImp : UserRepository {
