@@ -11,10 +11,17 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.ui.AppActivity
 import ru.netology.nmedia.R
-import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.repository.post.PostRepository
+import ru.netology.nmedia.repository.post.PostRepositoryImp
 import kotlin.random.Random
 
 class FCMService : FirebaseMessagingService() {
@@ -22,7 +29,6 @@ class FCMService : FirebaseMessagingService() {
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
-    private val scope = MainScope()
 
     override fun onCreate() {
         super.onCreate()
@@ -39,37 +45,56 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        try {
-            when (message.data[action]?.let { Action.valueOf(it) }) {
-                Action.LIKE ->
-                    handleLike(
-                            gson.fromJson(
-                                    message.data[content],
-                                    RemoteClass::class.java
+        CoroutineScope(Dispatchers.Default).launch {
+            val userId = AppAuth.getInstance().authStateFlow.value.id
+            val remoteId = gson.fromJson(
+                    message.data[content],
+                    Message::class.java
+            ).recipientId
+            println(remoteId)
+            if (remoteId == userId || remoteId == null) {
+                try {
+                    when (message.data[action]?.let { Action.valueOf(it) }) {
+                        Action.LIKE ->
+                            handleLike(
+                                    gson.fromJson(
+                                            message.data[content],
+                                            RemoteClass::class.java
+                                    )
                             )
-                    )
 
-                Action.SHARE ->
-                    handleShare(
-                            gson.fromJson(
-                                    message.data[content],
-                                    RemoteClass::class.java
+                        Action.SHARE ->
+                            handleShare(
+                                    gson.fromJson(
+                                            message.data[content],
+                                            RemoteClass::class.java
+                                    )
                             )
-                    )
 
-                Action.POST -> handlePost(gson.fromJson(message.data[content], Post::class.java))
-
-                else -> handleMessage(message)
+                        Action.POST -> handlePost(
+                                gson.fromJson(
+                                        message.data[content],
+                                        Post::class.java
+                                )
+                        )
+                        else -> handleMessage(message)
+                    }
+                } catch (e: IllegalArgumentException) {
+                    e.printStackTrace()
+                }
+            } else {
+                AppAuth.getInstance().sendPushToken()
             }
-        } catch (e: IllegalArgumentException) {
         }
     }
 
+
     override fun onNewToken(token: String) {
         println(token)
+        AppAuth.getInstance().sendPushToken(token)
     }
 
-    private fun handleLike(content: RemoteClass) {
+    private suspend fun handleLike(content: RemoteClass) {
         val notification = NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_notification_like)
                 .setContentTitle(
@@ -86,10 +111,10 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-//        getRepository().likeById(content.postId)
+        getRepository().likeById(content.postId)
     }
 
-    private fun handleShare(content: RemoteClass) {
+    private suspend fun handleShare(content: RemoteClass) {
         val notification = NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_notification_share)
                 .setContentTitle(
@@ -106,10 +131,10 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-//        getRepository().shareById(content.postId)
+        getRepository().shareById(content.postId)
     }
 
-    private fun handlePost(content: Post) {
+    private suspend fun handlePost(content: Post) {
         val notification = NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_notification_post)
                 .setContentTitle(
@@ -127,7 +152,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-//        getRepository().save(content)
+        getRepository().save(content)
 
     }
 
@@ -146,9 +171,9 @@ class FCMService : FirebaseMessagingService() {
                 .notify(Random.nextInt(100_000), notification)
     }
 
-//    private fun getRepository(): PostRepository {
-//        return PostRepositoryImp(AppDb.getInstance(context = application).postDao())
-//    }
+    private fun getRepository(): PostRepository {
+        return PostRepositoryImp(AppDb.getInstance(context = application).postDao())
+    }
 
     private fun getPendingIntent(): PendingIntent {
         val intent = Intent(this, AppActivity::class.java)
@@ -170,4 +195,9 @@ data class RemoteClass(
         val postAuthor: String,
         val content: String,
         val published: String,
+)
+
+data class Message(
+        val recipientId: Long?,
+        val content: String,
 )

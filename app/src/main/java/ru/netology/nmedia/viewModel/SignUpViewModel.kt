@@ -9,13 +9,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.R
 import ru.netology.nmedia.model.PhotoModel
-import ru.netology.nmedia.post.MediaUpload
-import ru.netology.nmedia.post.User
+import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.repository.user.UserRepository
 import ru.netology.nmedia.repository.user.UserRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent

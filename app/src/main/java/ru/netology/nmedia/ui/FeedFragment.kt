@@ -20,8 +20,8 @@ import ru.netology.nmedia.adapter.OnInterractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.post.AttachmentType
-import ru.netology.nmedia.post.Post
+import ru.netology.nmedia.dto.AttachmentType
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
 

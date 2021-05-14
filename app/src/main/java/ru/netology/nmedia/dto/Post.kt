@@ -1,4 +1,4 @@
-package ru.netology.nmedia.post
+package ru.netology.nmedia.dto
 
 import android.os.Parcel
 import android.os.Parcelable
