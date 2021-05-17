@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
@@ -35,6 +36,7 @@ val emptyPost = Post(
         views = 0,
         likedByMe = false,
         uploadedToServer = false,
+        attachment = null,
         read = true
 )
 
