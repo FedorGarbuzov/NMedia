@@ -82,6 +82,7 @@ dependencies {
     def okhttploggin_version = "4.9.1"
     def coroutines_version = "1.4.3"
     def imagepicker_version = "1.8"
+    def workmanager_version = "2.5.0"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
@@ -116,4 +117,5 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "com.github.dhaval2404:imagepicker:$imagepicker_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
+    implementation "androidx.work:work-runtime-ktx:$workmanager_version"
 }

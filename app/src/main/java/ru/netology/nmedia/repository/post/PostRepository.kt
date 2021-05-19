@@ -18,4 +18,6 @@ interface PostRepository {
     suspend fun likedByMe(id: Long)
     suspend fun unlikedByMe(id: Long)
     suspend fun upload(upload: MediaUpload): Media
+    suspend fun saveWork(post: Post, upload: MediaUpload?): Long
+    suspend fun processWork(id: Long)
 }
