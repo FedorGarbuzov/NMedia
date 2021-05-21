@@ -8,7 +8,6 @@ import androidx.lifecycle.*
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -47,6 +46,7 @@ val emptyPost = Post(
 
 private val noPhoto = PhotoModel()
 
+@ExperimentalCoroutinesApi
 class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
         PostRepositoryImp(
@@ -57,7 +57,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val workManager: WorkManager =
         WorkManager.getInstance(application)
 
-    @ExperimentalCoroutinesApi
     val data: LiveData<FeedModel> = AppAuth.getInstance()
         .authStateFlow
         .flatMapLatest { (myId, _) ->
