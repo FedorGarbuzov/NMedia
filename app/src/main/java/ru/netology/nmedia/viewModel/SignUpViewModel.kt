@@ -1,6 +1,7 @@
 package ru.netology.nmedia.viewModel
 
 import android.app.Application
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -10,11 +11,13 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.R
-import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.model.PhotoModel
+import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.repository.user.UserRepository
 import ru.netology.nmedia.repository.user.UserRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.File
+import java.lang.Exception
 
 private val noPhoto = PhotoModel()
 
@@ -28,6 +31,10 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
         get() = _photo
+
+    fun changePhoto(uri: Uri?, file: File?) {
+        _photo.value = PhotoModel(uri, file)
+    }
 
     fun createUser(login: String, pass: String, name: String) = viewModelScope.launch {
         try {
