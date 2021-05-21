@@ -2,7 +2,6 @@ package ru.netology.nmedia.repository.post
 
 import android.net.Uri
 import androidx.core.net.toFile
-import androidx.work.ListenableWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -55,6 +54,7 @@ class PostRepositoryImp(
 
     override suspend fun getAll() {
         try {
+            delay(1000)
             val response = PostApi.retrofitService.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
@@ -159,24 +159,6 @@ class PostRepositoryImp(
         //TODO("Not yet implemented")
     }
 
-    override suspend fun removeById(id: Long) {
-        val post = data
-            .first()
-            .find { it.id == id }
-        dao.removeById(id)
-        try {
-            val response = PostApi.retrofitService.removeById(id)
-            if (!response.isSuccessful) {
-                if (post != null) dao.insert(PostEntity.fromPost(post))
-                throw ApiError(response.code(), response.message())
-            }
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
     override suspend fun saveWork(post: Post, upload: MediaUpload?): Long {
         try {
             val entity = PostWorkEntity.fromPost(post).apply {
@@ -220,6 +202,23 @@ class PostRepositoryImp(
                     postWorkDao.removeById(id)
                 }
             }
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun removeByIdWork(id: Long) {
+        val post = data.first()
+            .find { it.id == id }
+        dao.removeById(id)
+        try {
+            val response = PostApi.retrofitService.removeById(id)
+            if (!response.isSuccessful) {
+                if (post != null) dao.insert(PostEntity.fromPost(post))
+                throw ApiError(response.code(), response.message())
+            }
+        } catch (e: IOException) {
+            throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }

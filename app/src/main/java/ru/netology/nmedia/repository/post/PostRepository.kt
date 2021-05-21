@@ -14,7 +14,7 @@ interface PostRepository {
     suspend fun save(post: Post)
     suspend fun saveWithAttachment(post: Post, upload: MediaUpload)
     suspend fun getAll()
-    suspend fun removeById(id: Long)
+    suspend fun removeByIdWork(id: Long)
     suspend fun likedByMe(id: Long)
     suspend fun unlikedByMe(id: Long)
     suspend fun upload(upload: MediaUpload): Media

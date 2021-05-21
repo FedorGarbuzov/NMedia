@@ -8,6 +8,7 @@ import androidx.lifecycle.*
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -15,16 +16,17 @@ import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.MediaUpload
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.PhotoModel
-import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.post.PostRepository
 import ru.netology.nmedia.repository.post.PostRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
+import ru.netology.nmedia.work.RemovePostWorker
 import ru.netology.nmedia.work.SavePostWorker
+import ru.netology.nmedia.work.SavePostWorker.Companion.postKey
 import java.io.File
 
 val emptyPost = Post(
@@ -113,7 +115,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     val id = repository.saveWork(
                             it, _photo.value?.uri?.let { MediaUpload(it.toFile()) }
                     )
-                    val data = workDataOf(SavePostWorker.postKey to id)
+                    val data = workDataOf(postKey to id)
                     val constraints = Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build()
@@ -152,17 +154,25 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _photo.value = PhotoModel(uri, file)
     }
 
-    fun removeById(id: Long) {
+    fun removeById(id:Long) {
         viewModelScope.launch {
             try {
-                repository.removeById(id)
+                val data = workDataOf(postKey to id)
+                val constraints = Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                val request = OneTimeWorkRequestBuilder<RemovePostWorker>()
+                        .setInputData(data)
+                        .setConstraints(constraints)
+                        .build()
+                workManager.enqueue(request)
+
                 _dataState.value = FeedModelState()
-                loadPosts()
             } catch (e: Exception) {
                 Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
-                loadPosts()
             }
         }
+        loadPosts()
     }
 
     fun likedByMe(id: Long) {
