@@ -152,7 +152,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
             .notify(Random.nextInt(100_000), notification)
-        getRepository().save(content)
+        getRepository().processWork(content.id)
 
     }
 

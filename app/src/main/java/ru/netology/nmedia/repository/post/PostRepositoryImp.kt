@@ -71,37 +71,6 @@ class PostRepositoryImp(
         }
     }
 
-    override suspend fun save(post: Post) {
-        val old = data
-            .first()
-            .find { it.content == post.content }
-        val edited = data
-            .first()
-            .find { it.id == post.id }
-        if (old?.content == post.content) {
-            uploadToServer(old)
-        } else if (edited?.id == post.id) {
-            editPost(post, edited)
-        } else {
-            savePost(post)
-        }
-    }
-
-    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
-        try {
-            val media = upload(upload)
-            val postWithAttachment =
-                post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
-            save(postWithAttachment)
-        } catch (e: AppError) {
-            throw e
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
     override suspend fun upload(upload: MediaUpload): Media {
         try {
             val media = MultipartBody.Part.createFormData(
