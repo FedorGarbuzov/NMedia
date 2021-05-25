@@ -28,7 +28,7 @@ class SignInViewModel(application: Application) : AndroidViewModel(application) 
             } else {
                 Toast.makeText(getApplication(), R.string.empty_field, Toast.LENGTH_LONG).show()
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             Toast.makeText(getApplication(), R.string.invalid_user, Toast.LENGTH_LONG).show()
         }
     }

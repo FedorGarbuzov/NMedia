@@ -25,7 +25,7 @@ interface OnInterractionListener {
 }
 
 class PostAdapter(
-    private val onInterractionListener: OnInterractionListener,
+        private val onInterractionListener: OnInterractionListener,
 ) : ListAdapter<Post, PostViewHolder>(PostDiffCallBack()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -40,8 +40,8 @@ class PostAdapter(
 }
 
 class PostViewHolder(
-    private val binding: PostCardBinding,
-    private val onInterractionListener: OnInterractionListener,
+        private val binding: PostCardBinding,
+        private val onInterractionListener: OnInterractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {
         binding.apply {
@@ -82,20 +82,20 @@ class PostViewHolder(
 
             val url = "$BASE_URL/avatars/${post.authorAvatar}"
             Glide.with(binding.postAvatar)
-                .load(url)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .circleCrop()
-                .into(binding.postAvatar)
+                    .load(url)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .circleCrop()
+                    .into(binding.postAvatar)
 
             val attUrl = "$BASE_URL/images/${post.attachment?.url}"
             Glide.with(binding.attachment)
-                .load(attUrl)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .into(binding.attachment)
+                    .load(attUrl)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.attachment)
 
             val myUrl = "$BASE_URL/media/${post.attachment?.url}"
             Glide.with(binding.attachment)
@@ -123,7 +123,7 @@ class PostViewHolder(
             done?.isVisible = post.ownedByMe
             done?.isEnabled = post.uploadedToServer
 
-            if(done?.isEnabled == false) {
+            if (done?.isEnabled == false) {
                 favorite.isClickable = false
                 share.isClickable = false
             }
@@ -140,7 +140,3 @@ class PostDiffCallBack : DiffUtil.ItemCallback<Post>() {
         return oldItem == newItem
     }
 }
-
-
-
-

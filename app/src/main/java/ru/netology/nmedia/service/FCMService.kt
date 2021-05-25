@@ -152,7 +152,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().save(content)
+        getRepository().processWork(content.id)
 
     }
 
@@ -172,7 +172,10 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun getRepository(): PostRepository {
-        return PostRepositoryImp(AppDb.getInstance(context = application).postDao())
+        return PostRepositoryImp(
+                AppDb.getInstance(context = application).postDao(),
+                AppDb.getInstance(context = application).postWorkDao()
+        )
     }
 
     private fun getPendingIntent(): PendingIntent {

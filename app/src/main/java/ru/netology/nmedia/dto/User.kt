@@ -10,5 +10,5 @@ data class User(
 
 data class Token(
         val id: Long,
-        val token: String
+        val token: String,
 )

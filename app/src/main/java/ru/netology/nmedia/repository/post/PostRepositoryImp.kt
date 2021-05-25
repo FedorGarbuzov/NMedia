@@ -1,5 +1,7 @@
 package ru.netology.nmedia.repository.post
 
+import android.net.Uri
+import androidx.core.net.toFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -7,8 +9,10 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dao.PostWorkDao
 import ru.netology.nmedia.dto.*
 import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.entity.PostWorkEntity
 import ru.netology.nmedia.entity.fromPost
 import ru.netology.nmedia.entity.toPost
 import ru.netology.nmedia.error.ApiError
@@ -17,7 +21,10 @@ import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
 
-class PostRepositoryImp(private val dao: PostDao) : PostRepository {
+class PostRepositoryImp(
+        private val dao: PostDao,
+        private val postWorkDao: PostWorkDao,
+) : PostRepository {
     override val data = dao.getAll()
             .map(List<PostEntity>::toPost)
             .flowOn(Dispatchers.Default)
@@ -47,6 +54,7 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
 
     override suspend fun getAll() {
         try {
+            delay(1000)
             val response = PostApi.retrofitService.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
@@ -63,40 +71,10 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
         }
     }
 
-    override suspend fun save(post: Post) {
-        val old = data
-                .first()
-                .find { it.content == post.content }
-        val edited = data
-                .first()
-                .find { it.id == post.id }
-        if (old?.content == post.content) {
-            uploadToServer(old)
-        } else if (edited?.id == post.id) {
-            editPost(post, edited)
-        } else {
-            savePost(post)
-        }
-    }
-
-    override suspend fun saveWithAttachment(post: Post, upload: MediaUpload) {
-        try {
-            val media = upload(upload)
-            val postWithAttachment = post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
-            save(postWithAttachment)
-        } catch (e: AppError) {
-            throw e
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
-
     override suspend fun upload(upload: MediaUpload): Media {
         try {
             val media = MultipartBody.Part.createFormData(
-                "file", upload.file.name, upload.file.asRequestBody()
+                    "file", upload.file.name, upload.file.asRequestBody()
             )
 
             val response = PostApi.retrofitService.upload(media)
@@ -150,9 +128,56 @@ class PostRepositoryImp(private val dao: PostDao) : PostRepository {
         //TODO("Not yet implemented")
     }
 
-    override suspend fun removeById(id: Long) {
-        val post = data
-                .first()
+    override suspend fun saveWork(post: Post, upload: MediaUpload?): Long {
+        try {
+            val entity = PostWorkEntity.fromPost(post).apply {
+                if (upload != null) {
+                    this.uri = upload.file.toURI().toString()
+                }
+            }
+            return postWorkDao.insert(entity)
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun processWork(id: Long) {
+        try {
+            val entity = postWorkDao.getById(id)
+            val post = entity.toPost().copy(id = 0)
+            val old = data.first()
+                    .find { it.content == post.content && it.attachment == post.attachment }
+            val edited = data.first()
+                    .find { it.id == post.id }
+
+            when {
+                old != null -> {
+                    uploadToServer(old)
+                }
+                edited != null -> {
+                    editPost(post, edited)
+                }
+                else -> {
+                    if (entity.uri != null) {
+                        val upload = MediaUpload(Uri.parse(entity.uri).toFile())
+                        val postWithAttachment = post.copy(
+                                id = 0,
+                                attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
+                        )
+                        savePost(postWithAttachment)
+                    } else {
+                        savePost(post)
+                    }
+                    postWorkDao.removeById(id)
+                }
+            }
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun removeByIdWork(id: Long) {
+        val post = data.first()
                 .find { it.id == id }
         dao.removeById(id)
         try {

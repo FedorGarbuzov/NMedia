@@ -33,15 +33,15 @@ class SignUpFragment : DialogFragment() {
         val binding = FragmentSignUpBinding.inflate(layoutInflater, container, false)
 
         binding.registerButton.setOnClickListener {
-                if (binding.password.editText?.text.toString() == binding.confirmPassword.editText?.text.toString()) {
-                        viewModel.createUser(
-                                binding.login.editText?.text.toString(),
-                                binding.password.editText?.text.toString(),
-                                binding.name.editText?.text.toString()
-                        )
-                } else {
-                    Toast.makeText(activity, R.string.fields_are_not_the_same, Toast.LENGTH_LONG).show()
-                }
+            if (binding.password.editText?.text.toString() == binding.confirmPassword.editText?.text.toString()) {
+                viewModel.createUser(
+                        binding.login.editText?.text.toString(),
+                        binding.password.editText?.text.toString(),
+                        binding.name.editText?.text.toString()
+                )
+            } else {
+                Toast.makeText(activity, R.string.fields_are_not_the_same, Toast.LENGTH_LONG).show()
+            }
         }
         viewModel.registered.observe(viewLifecycleOwner) {
             dismiss()

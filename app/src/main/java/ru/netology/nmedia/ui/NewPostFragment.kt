@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -62,8 +63,8 @@ class NewPostFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.save -> {
-                fragmentBinding?.let {
-                    viewModel.changeContent(it.edit.text.toString())
+                fragmentBinding?.let { binding ->
+                    viewModel.changeContent(binding.edit.text.toString())
                     viewModel.save()
                     AndroidUtils.hideKeyboard(requireView())
                 }
