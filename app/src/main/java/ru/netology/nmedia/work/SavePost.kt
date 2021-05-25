@@ -7,8 +7,8 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.repository.post.PostRepositoryImp
 
 class SavePostWorker(
-    applicationContext: Context,
-    params: WorkerParameters
+        applicationContext: Context,
+        params: WorkerParameters,
 ) : CoroutineWorker(applicationContext, params) {
     companion object {
         const val postKey = "post"
@@ -21,8 +21,8 @@ class SavePostWorker(
         }
 
         val repository = PostRepositoryImp(
-            AppDb.getInstance(applicationContext).postDao(),
-            AppDb.getInstance(applicationContext).postWorkDao()
+                AppDb.getInstance(applicationContext).postDao(),
+                AppDb.getInstance(applicationContext).postWorkDao()
         )
 
         return try {

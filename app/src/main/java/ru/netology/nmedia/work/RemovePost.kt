@@ -12,7 +12,7 @@ import java.lang.NullPointerException
 
 class RemovePostWorker(
         applicationContext: Context,
-        params: WorkerParameters
+        params: WorkerParameters,
 ) : CoroutineWorker(applicationContext, params) {
 
     override suspend fun doWork(): Result {

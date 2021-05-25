@@ -62,11 +62,11 @@ interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(post: PostEntity) {
         insert(
-            post.copy(author = if(post.author == "") "Me" else post.author,
-                published = LocalDateTime.now().format(
-                    DateTimeFormatter.ofPattern("dd MMMM в HH:mm")
+                post.copy(author = if (post.author == "") "Me" else post.author,
+                        published = LocalDateTime.now().format(
+                                DateTimeFormatter.ofPattern("dd MMMM в HH:mm")
+                        )
                 )
-            )
         )
     }
 

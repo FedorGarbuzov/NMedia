@@ -25,13 +25,13 @@ import ru.netology.nmedia.viewModel.PostViewModel
 
 class CardFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
-        ownerProducer = ::requireParentFragment
+            ownerProducer = ::requireParentFragment
     )
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?,
     ): View? {
         val binding = FragmentCardBinding.inflate(inflater, container, false)
 
@@ -61,11 +61,11 @@ class CardFragment : Fragment() {
                                     }
                                     R.id.edit -> {
                                         findNavController().navigate(
-                                            R.id.action_cardFragment_to_newPostFragment,
-                                            Bundle().apply {
-                                                textArg = it.content
-                                                viewModel.edit(it)
-                                            })
+                                                R.id.action_cardFragment_to_newPostFragment,
+                                                Bundle().apply {
+                                                    textArg = it.content
+                                                    viewModel.edit(it)
+                                                })
                                         true
                                     }
                                     else -> false
@@ -84,44 +84,44 @@ class CardFragment : Fragment() {
 
                     val url = "$BASE_URL/avatars/${it.authorAvatar}"
                     Glide.with(binding.postAvatar)
-                        .load(url)
-                        .placeholder(R.drawable.ic_loading_100dp)
-                        .error(R.drawable.ic_error_100dp)
-                        .timeout(10_000)
-                        .circleCrop()
-                        .into(binding.postAvatar)
+                            .load(url)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .timeout(10_000)
+                            .circleCrop()
+                            .into(binding.postAvatar)
 
                     val attUrl = "$BASE_URL/images/${it.attachment?.url}"
                     Glide.with(binding.attachment)
-                        .load(attUrl)
-                        .placeholder(R.drawable.ic_loading_100dp)
-                        .error(R.drawable.ic_error_100dp)
-                        .timeout(10_000)
-                        .into(binding.attachment)
+                            .load(attUrl)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .timeout(10_000)
+                            .into(binding.attachment)
 
                     val myUrl = "$BASE_URL/media/${it.attachment?.url}"
                     Glide.with(binding.attachment)
-                        .load(myUrl)
-                        .placeholder(R.drawable.ic_loading_100dp)
-                        .error(R.drawable.ic_error_100dp)
-                        .timeout(10_000)
-                        .into(binding.attachment)
+                            .load(myUrl)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .timeout(10_000)
+                            .into(binding.attachment)
                 }
 
                 binding.attachment.setOnClickListener { _ ->
                     when (it?.attachment?.type) {
                         AttachmentType.IMAGE -> findNavController().navigate(
-                            R.id.action_cardFragment_to_imageFragment,
-                            Bundle().apply {
-                                textArg = it.attachment.url
-                            })
+                                R.id.action_cardFragment_to_imageFragment,
+                                Bundle().apply {
+                                    textArg = it.attachment.url
+                                })
                         else -> {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it?.attachment?.url))
                             if (activity?.packageManager?.let { intent.resolveActivity(it) } != null) {
                                 startActivity(intent)
                             } else {
                                 Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT)
-                                    .show()
+                                        .show()
                             }
                         }
                     }

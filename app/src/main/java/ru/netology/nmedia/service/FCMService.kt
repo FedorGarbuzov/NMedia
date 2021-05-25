@@ -48,8 +48,8 @@ class FCMService : FirebaseMessagingService() {
         CoroutineScope(Dispatchers.Default).launch {
             val userId = AppAuth.getInstance().authStateFlow.value.id
             val remoteId = gson.fromJson(
-                message.data[content],
-                Message::class.java
+                    message.data[content],
+                    Message::class.java
             ).recipientId
             println(remoteId)
             if (remoteId == userId || remoteId == null) {
@@ -57,25 +57,25 @@ class FCMService : FirebaseMessagingService() {
                     when (message.data[action]?.let { Action.valueOf(it) }) {
                         Action.LIKE ->
                             handleLike(
-                                gson.fromJson(
-                                    message.data[content],
-                                    RemoteClass::class.java
-                                )
+                                    gson.fromJson(
+                                            message.data[content],
+                                            RemoteClass::class.java
+                                    )
                             )
 
                         Action.SHARE ->
                             handleShare(
-                                gson.fromJson(
-                                    message.data[content],
-                                    RemoteClass::class.java
-                                )
+                                    gson.fromJson(
+                                            message.data[content],
+                                            RemoteClass::class.java
+                                    )
                             )
 
                         Action.POST -> handlePost(
-                            gson.fromJson(
-                                message.data[content],
-                                Post::class.java
-                            )
+                                gson.fromJson(
+                                        message.data[content],
+                                        Post::class.java
+                                )
                         )
                         else -> handleMessage(message)
                     }
@@ -96,85 +96,85 @@ class FCMService : FirebaseMessagingService() {
 
     private suspend fun handleLike(content: RemoteClass) {
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_notification_like)
-            .setContentTitle(
-                getString(
-                    R.string.notification_user_liked,
-                    content.userName,
-                    content.postAuthor
+                .setSmallIcon(R.drawable.ic_notification_like)
+                .setContentTitle(
+                        getString(
+                                R.string.notification_user_liked,
+                                content.userName,
+                                content.postAuthor
+                        )
                 )
-            )
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(getPendingIntent())
-            .setAutoCancel(true)
-            .build()
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(getPendingIntent())
+                .setAutoCancel(true)
+                .build()
 
         NotificationManagerCompat.from(this)
-            .notify(Random.nextInt(100_000), notification)
+                .notify(Random.nextInt(100_000), notification)
         getRepository().likeById(content.postId)
     }
 
     private suspend fun handleShare(content: RemoteClass) {
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_notification_share)
-            .setContentTitle(
-                getString(
-                    R.string.notification_user_share,
-                    content.userName,
-                    content.postAuthor
+                .setSmallIcon(R.drawable.ic_notification_share)
+                .setContentTitle(
+                        getString(
+                                R.string.notification_user_share,
+                                content.userName,
+                                content.postAuthor
+                        )
                 )
-            )
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(getPendingIntent())
-            .setAutoCancel(true)
-            .build()
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(getPendingIntent())
+                .setAutoCancel(true)
+                .build()
 
         NotificationManagerCompat.from(this)
-            .notify(Random.nextInt(100_000), notification)
+                .notify(Random.nextInt(100_000), notification)
         getRepository().shareById(content.postId)
     }
 
     private suspend fun handlePost(content: Post) {
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_notification_post)
-            .setContentTitle(
-                getString(
-                    R.string.notification_user_post_title,
-                    content.author
+                .setSmallIcon(R.drawable.ic_notification_post)
+                .setContentTitle(
+                        getString(
+                                R.string.notification_user_post_title,
+                                content.author
+                        )
                 )
-            )
-            .setContentText(content.content)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(content.content))
-            .setContentIntent(getPendingIntent())
-            .setAutoCancel(true)
-            .build()
+                .setContentText(content.content)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(content.content))
+                .setContentIntent(getPendingIntent())
+                .setAutoCancel(true)
+                .build()
 
         NotificationManagerCompat.from(this)
-            .notify(Random.nextInt(100_000), notification)
+                .notify(Random.nextInt(100_000), notification)
         getRepository().processWork(content.id)
 
     }
 
     private fun handleMessage(message: RemoteMessage) {
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle(message.data["title"])
-            .setContentText(message.data["content"])
-            .setSmallIcon(R.drawable.ic_notification)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message.data["content"]))
-            .setContentIntent(getPendingIntent())
-            .setAutoCancel(true)
-            .build()
+                .setContentTitle(message.data["title"])
+                .setContentText(message.data["content"])
+                .setSmallIcon(R.drawable.ic_notification)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message.data["content"]))
+                .setContentIntent(getPendingIntent())
+                .setAutoCancel(true)
+                .build()
 
         NotificationManagerCompat.from(applicationContext)
-            .notify(Random.nextInt(100_000), notification)
+                .notify(Random.nextInt(100_000), notification)
     }
 
     private fun getRepository(): PostRepository {
         return PostRepositoryImp(
-            AppDb.getInstance(context = application).postDao(),
-            AppDb.getInstance(context = application).postWorkDao()
+                AppDb.getInstance(context = application).postDao(),
+                AppDb.getInstance(context = application).postWorkDao()
         )
     }
 
@@ -192,15 +192,15 @@ enum class Action {
 }
 
 data class RemoteClass(
-    val userId: Long,
-    val userName: String,
-    val postId: Long,
-    val postAuthor: String,
-    val content: String,
-    val published: String,
+        val userId: Long,
+        val userName: String,
+        val postId: Long,
+        val postAuthor: String,
+        val content: String,
+        val published: String,
 )
 
 data class Message(
-    val recipientId: Long?,
-    val content: String,
+        val recipientId: Long?,
+        val content: String,
 )

@@ -10,18 +10,18 @@ import ru.netology.nmedia.repository.post.PostRepositoryImp
 import java.lang.Exception
 
 class RefreshPostsWorker(
-    applicationContext: Context,
-    params: WorkerParameters
+        applicationContext: Context,
+        params: WorkerParameters,
 ) : CoroutineWorker(applicationContext, params) {
     companion object {
         const val name = "ru.netology.work.RefreshPostsWorker"
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.Default) {
-        val repository = PostRepositoryImp (
-            AppDb.getInstance(context = applicationContext).postDao(),
-            AppDb.getInstance(context = applicationContext).postWorkDao()
-                )
+        val repository = PostRepositoryImp(
+                AppDb.getInstance(context = applicationContext).postDao(),
+                AppDb.getInstance(context = applicationContext).postWorkDao()
+        )
 
         try {
             repository.getAll()

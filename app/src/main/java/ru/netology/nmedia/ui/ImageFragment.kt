@@ -47,8 +47,8 @@ class ImageFragment : Fragment() {
                 buttonShare.text = display(it.share)
                 buttonViews.text = display(it.views)
                 if (it.likedByMe) toggleButton.check(buttonLikes.id)
-                    }
-                }
+            }
+        }
 
         binding.topAppBar.setOnMenuItemClickListener {
             findNavController().popBackStack()

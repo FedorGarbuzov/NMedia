@@ -22,12 +22,12 @@ import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
 
 class PostRepositoryImp(
-    private val dao: PostDao,
-    private val postWorkDao: PostWorkDao,
+        private val dao: PostDao,
+        private val postWorkDao: PostWorkDao,
 ) : PostRepository {
     override val data = dao.getAll()
-        .map(List<PostEntity>::toPost)
-        .flowOn(Dispatchers.Default)
+            .map(List<PostEntity>::toPost)
+            .flowOn(Dispatchers.Default)
 
     override fun getNewer(id: Long): Flow<List<Post>> = flow {
         while (true) {
@@ -42,8 +42,8 @@ class PostRepositoryImp(
             emit(body)
         }
     }
-        .catch { e -> throw AppError.from(e) }
-        .flowOn(Dispatchers.Default)
+            .catch { e -> throw AppError.from(e) }
+            .flowOn(Dispatchers.Default)
 
     override suspend fun loadNewer() {
         val newer = dao.getNewer()
@@ -74,7 +74,7 @@ class PostRepositoryImp(
     override suspend fun upload(upload: MediaUpload): Media {
         try {
             val media = MultipartBody.Part.createFormData(
-                "file", upload.file.name, upload.file.asRequestBody()
+                    "file", upload.file.name, upload.file.asRequestBody()
             )
 
             val response = PostApi.retrofitService.upload(media)
@@ -146,9 +146,9 @@ class PostRepositoryImp(
             val entity = postWorkDao.getById(id)
             val post = entity.toPost().copy(id = 0)
             val old = data.first()
-                .find { it.content == post.content && it.attachment == post.attachment }
+                    .find { it.content == post.content && it.attachment == post.attachment }
             val edited = data.first()
-                .find { it.id == post.id }
+                    .find { it.id == post.id }
 
             when {
                 old != null -> {
@@ -161,8 +161,8 @@ class PostRepositoryImp(
                     if (entity.uri != null) {
                         val upload = MediaUpload(Uri.parse(entity.uri).toFile())
                         val postWithAttachment = post.copy(
-                            id = 0,
-                            attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
+                                id = 0,
+                                attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
                         )
                         savePost(postWithAttachment)
                     } else {
@@ -178,7 +178,7 @@ class PostRepositoryImp(
 
     override suspend fun removeByIdWork(id: Long) {
         val post = data.first()
-            .find { it.id == id }
+                .find { it.id == id }
         dao.removeById(id)
         try {
             val response = PostApi.retrofitService.removeById(id)
@@ -232,7 +232,7 @@ class PostRepositoryImp(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body()
-                ?: throw ApiError(response.code(), response.message())
+                    ?: throw ApiError(response.code(), response.message())
             dao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
         } catch (e: IOException) {
             throw NetworkError

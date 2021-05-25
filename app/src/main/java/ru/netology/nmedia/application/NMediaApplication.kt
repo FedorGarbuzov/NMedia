@@ -9,7 +9,7 @@ import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.work.RefreshPostsWorker
 import java.util.concurrent.TimeUnit
 
-class NMediaApplication: Application() {
+class NMediaApplication : Application() {
     private val appScope = CoroutineScope(Dispatchers.Default)
 
     override fun onCreate() {
@@ -27,15 +27,15 @@ class NMediaApplication: Application() {
     private fun setupWork() {
         appScope.launch {
             val constrains = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
             val request = PeriodicWorkRequestBuilder<RefreshPostsWorker>(1, TimeUnit.MINUTES)
-                .setConstraints(constrains)
-                .build()
+                    .setConstraints(constrains)
+                    .build()
             WorkManager.getInstance(this@NMediaApplication).enqueueUniquePeriodicWork(
-                RefreshPostsWorker.name,
-                ExistingPeriodicWorkPolicy.KEEP,
-                request
+                    RefreshPostsWorker.name,
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    request
             )
         }
     }
