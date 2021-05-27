@@ -8,6 +8,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
@@ -18,20 +19,13 @@ import ru.netology.nmedia.util.AndroidUtils.display
 
 class ImageFragment : Fragment() {
 
+    @ExperimentalCoroutinesApi
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
         val binding = FragmentImageBinding.inflate(inflater, container, false)
-
-        val url = "$BASE_URL/images/${arguments?.textArg}"
-        Glide.with(binding.image)
-                .load(url)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .into(binding.image)
 
         val myUrl = "$BASE_URL/media/${arguments?.textArg}"
         Glide.with(binding.image)

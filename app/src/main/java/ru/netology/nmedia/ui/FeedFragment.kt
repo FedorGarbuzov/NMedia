@@ -100,6 +100,7 @@ class FeedFragment : Fragment() {
                 findNavController().navigate(
                         R.id.action_feedFragment_to_newPostFragment,
                         Bundle().apply {
+                            textArg = post.content
                             postArg = post
                             viewModel.edit(post)
                         })
@@ -152,15 +153,15 @@ class FeedFragment : Fragment() {
                     binding.emptyText.isVisible = state.empty
                 })
 
-        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
-            if (state.isNotEmpty()) {
-                binding.newer.visibility = View.VISIBLE
-                binding.newer.setOnClickListener {
-                    viewModel.loadNewer()
-                    binding.newer.visibility = View.GONE
-                }
-            }
-        }
+//        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
+//            if (state.isNotEmpty()) {
+//                binding.newer.visibility = View.VISIBLE
+//                binding.newer.setOnClickListener {
+//                    viewModel.loadNewer()
+//                    binding.newer.visibility = View.GONE
+//                }
+//            }
+//        }
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(

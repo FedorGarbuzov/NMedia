@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
@@ -23,6 +24,7 @@ import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.util.AndroidUtils.display
 import ru.netology.nmedia.viewModel.PostViewModel
 
+@ExperimentalCoroutinesApi
 class CardFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
             ownerProducer = ::requireParentFragment
@@ -90,14 +92,6 @@ class CardFragment : Fragment() {
                             .timeout(10_000)
                             .circleCrop()
                             .into(binding.postAvatar)
-
-                    val attUrl = "$BASE_URL/images/${it.attachment?.url}"
-                    Glide.with(binding.attachment)
-                            .load(attUrl)
-                            .placeholder(R.drawable.ic_loading_100dp)
-                            .error(R.drawable.ic_error_100dp)
-                            .timeout(10_000)
-                            .into(binding.attachment)
 
                     val myUrl = "$BASE_URL/media/${it.attachment?.url}"
                     Glide.with(binding.attachment)

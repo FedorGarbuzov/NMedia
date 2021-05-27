@@ -6,25 +6,28 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
-import java.io.File
 
+@ExperimentalCoroutinesApi
 class NewPostFragment : Fragment() {
-    private val photoRequestCode = 1
-    private val cameraRequestCode = 2
 
     companion object {
         private const val TEXT_KEY = "TEXT_KEY"
@@ -107,10 +110,37 @@ class NewPostFragment : Fragment() {
 
         fragmentBinding = binding
 
-        arguments?.textArg
-                ?.let(binding.edit::setText)
+        arguments?.postArg
+                ?.let { post ->
+                    binding.edit.setText(post.content)
+                    val myUrl = "${BuildConfig.BASE_URL}/media/${post.attachment?.url}"
+                    Glide.with(binding.photo)
+                            .load(myUrl)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .timeout(10_000)
+                            .into(binding.photo)
+                    viewModel.changePhoto(post.attachment?.url?.toUri())
+                }
 
         binding.edit.requestFocus()
+
+        val pickPhotoLauncher =
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    when (it.resultCode) {
+                        ImagePicker.RESULT_ERROR -> {
+                            Snackbar.make(
+                                    binding.root,
+                                    ImagePicker.getError(it.data),
+                                    Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                        Activity.RESULT_OK -> {
+                            val uri: Uri? = it.data?.data
+                            viewModel.changePhoto(uri)
+                        }
+                    }
+                }
 
         binding.pickPhoto.setOnClickListener {
             ImagePicker.with(this)
@@ -118,7 +148,7 @@ class NewPostFragment : Fragment() {
                     .compress(2048)
                     .galleryOnly()
                     .galleryMimeTypes(arrayOf("image/*"))
-                    .start(photoRequestCode)
+                    .createIntent(pickPhotoLauncher::launch)
         }
 
         binding.takePhoto.setOnClickListener {
@@ -126,11 +156,11 @@ class NewPostFragment : Fragment() {
                     .crop()
                     .compress(2048)
                     .cameraOnly()
-                    .start(cameraRequestCode)
+                    .createIntent(pickPhotoLauncher::launch)
         }
 
         binding.removePhoto.setOnClickListener {
-            viewModel.changePhoto(null, null)
+            viewModel.changePhoto(null)
         }
 
         viewModel.postCreated.observe(viewLifecycleOwner) {
@@ -152,28 +182,6 @@ class NewPostFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == ImagePicker.RESULT_ERROR) {
-            fragmentBinding?.let {
-                Snackbar.make(it.root, ImagePicker.getError(data), Snackbar.LENGTH_LONG).show()
-            }
-            return
-        }
-        if (resultCode == Activity.RESULT_OK && requestCode == photoRequestCode) {
-            val uri: Uri? = data?.data
-            val file: File? = ImagePicker.getFile(data)
-            viewModel.changePhoto(uri, file)
-            return
-        }
-        if (resultCode == Activity.RESULT_OK && requestCode == cameraRequestCode) {
-            val uri: Uri? = data?.data
-            val file: File? = ImagePicker.getFile(data)
-            viewModel.changePhoto(uri, file)
-            return
-        }
     }
 
     override fun onDestroyView() {

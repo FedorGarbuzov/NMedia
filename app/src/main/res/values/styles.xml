@@ -66,4 +66,10 @@
             #DE000000
         </item>
     </style>
+
+    <style name="closeButtonTheme" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="android:minWidth">@dimen/icon_button_size</item>
+        <item name="minHeight">@dimen/icon_button_size</item>
+    </style>
 </resources>
