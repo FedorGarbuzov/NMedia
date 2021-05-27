@@ -1,14 +1,10 @@
 package ru.netology.nmedia.util
 
-import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import androidx.activity.addCallback
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.findNavController
+import android.widget.ImageView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 
 object AndroidUtils {
@@ -33,5 +29,24 @@ object AndroidUtils {
             }
         }
         return newString
+    }
+
+    fun loadAvatar(imageView: ImageView, url: String) {
+        Glide.with(imageView)
+                .load(url)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .circleCrop()
+                .into(imageView)
+    }
+
+    fun loadImage(imageView: ImageView, url: String) {
+        Glide.with(imageView)
+                .load(url)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(imageView)
     }
 }

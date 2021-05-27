@@ -8,6 +8,7 @@ import androidx.lifecycle.*
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -15,6 +16,8 @@ import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.dto.Attachment
+import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
@@ -99,6 +102,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadPosts() = viewModelScope.launch {
         try {
+            delay(2000)
             _dataState.value = FeedModelState(loading = true)
             repository.getAll()
             _dataState.value = FeedModelState()
@@ -112,7 +116,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             viewModelScope.launch {
                 try {
                     val id = repository.saveWork(
-                            it, _photo.value?.uri?.let { MediaUpload(it.toFile()) }
+                            it,
+                            if (it.attachment?.url != _photo.value?.uri.toString()) {
+                                _photo.value?.uri?.let { MediaUpload(it.toFile()) }
+                            } else {
+                                null
+                            }
                     )
                     val data = workDataOf(postKey to id)
                     val constraints = Constraints.Builder()
@@ -143,14 +152,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun changeContent(content: String) {
         val text = content.trim()
-        if (edited.value?.content == text) {
-            return
+        when {
+            _photo.value?.uri == null -> {
+                edited.value = edited.value?.copy(attachment = null)
+            }
+            edited.value?.content == text -> {
+                return
+            }
+            else -> edited.value = edited.value?.copy(content = text)
         }
-        edited.value = edited.value?.copy(content = text)
     }
 
-    fun changePhoto(uri: Uri?, file: File?) {
-        _photo.value = PhotoModel(uri, file)
+    fun changePhoto(uri: Uri?) {
+        _photo.value = PhotoModel(uri)
     }
 
     fun removeById(id: Long) {

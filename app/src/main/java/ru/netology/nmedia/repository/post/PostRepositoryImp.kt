@@ -144,30 +144,27 @@ class PostRepositoryImp(
     override suspend fun processWork(id: Long) {
         try {
             val entity = postWorkDao.getById(id)
-            val post = entity.toPost().copy(id = 0)
+            var post = entity.toPost()
+            if (entity.uri != null) {
+                val upload = MediaUpload(Uri.parse(entity.uri).toFile())
+                post = post.copy(
+                        attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
+                )
+            }
+            val edited = data.first()
+                    .find { it.id == post.id && it.authorId == post.authorId }
             val old = data.first()
                     .find { it.content == post.content && it.attachment == post.attachment }
-            val edited = data.first()
-                    .find { it.id == post.id }
-
             when {
                 old != null -> {
                     uploadToServer(old)
                 }
                 edited != null -> {
-                    editPost(post, edited)
+                    editPost(post, edited.copy(attachment = post.attachment))
                 }
                 else -> {
-                    if (entity.uri != null) {
-                        val upload = MediaUpload(Uri.parse(entity.uri).toFile())
-                        val postWithAttachment = post.copy(
-                                id = 0,
-                                attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
-                        )
-                        savePost(postWithAttachment)
-                    } else {
-                        savePost(post)
-                    }
+                    post = post.copy(id = 0)
+                    savePost(post)
                     postWorkDao.removeById(id)
                 }
             }
@@ -231,8 +228,7 @@ class PostRepositoryImp(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body()
-                    ?: throw ApiError(response.code(), response.message())
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
             dao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
         } catch (e: IOException) {
             throw NetworkError

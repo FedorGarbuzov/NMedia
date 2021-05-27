@@ -3,6 +3,7 @@ package ru.netology.nmedia.viewModel
 import android.app.Application
 import android.net.Uri
 import android.widget.Toast
+import androidx.core.net.toFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,8 +33,8 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
     val photo: LiveData<PhotoModel>
         get() = _photo
 
-    fun changePhoto(uri: Uri?, file: File?) {
-        _photo.value = PhotoModel(uri, file)
+    fun changePhoto(uri: Uri?) {
+        _photo.value = PhotoModel(uri)
     }
 
     fun createUser(login: String, pass: String, name: String) = viewModelScope.launch {
@@ -47,12 +48,12 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
                         Toast.makeText(getApplication(), R.string.empty_field, Toast.LENGTH_LONG).show()
                     }
                 else ->
-                    photo.value?.file?.let {
+                    photo.value?.uri?.let {
                         repository.createWithPhoto(
                                 login.toRequestBody("text/plain".toMediaType()),
                                 pass.toRequestBody("text/plain".toMediaType()),
                                 name.toRequestBody("text/plain".toMediaType()),
-                                MediaUpload(it)
+                                MediaUpload(it.toFile())
                         )
                         _registered.value = Unit
                     }
