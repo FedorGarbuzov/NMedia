@@ -1,7 +1,6 @@
 package ru.netology.nmedia.ui
 
 import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -12,17 +11,16 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import ru.netology.nmedia.BuildConfig
+import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.util.AndroidUtils.loadImage
 import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
 
@@ -113,13 +111,8 @@ class NewPostFragment : Fragment() {
         arguments?.postArg
                 ?.let { post ->
                     binding.edit.setText(post.content)
-                    val myUrl = "${BuildConfig.BASE_URL}/media/${post.attachment?.url}"
-                    Glide.with(binding.photo)
-                            .load(myUrl)
-                            .placeholder(R.drawable.ic_loading_100dp)
-                            .error(R.drawable.ic_error_100dp)
-                            .timeout(10_000)
-                            .into(binding.photo)
+                    val mediaUrl = "${BASE_URL}/media/${post.attachment?.url}"
+                    loadImage(binding.photo, mediaUrl)
                     viewModel.changePhoto(post.attachment?.url?.toUri())
                 }
 
@@ -164,7 +157,7 @@ class NewPostFragment : Fragment() {
         }
 
         viewModel.postCreated.observe(viewLifecycleOwner) {
-            findNavController().navigateUp()
+            findNavController().popBackStack()
         }
 
         viewModel.photo.observe(viewLifecycleOwner) {

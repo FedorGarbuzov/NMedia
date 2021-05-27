@@ -102,7 +102,7 @@
                 android:paddingStart="@dimen/spacing"
                 app:icon="@drawable/ic_done_selector"
                 app:iconPadding="@dimen/halfSpacing"
-                app:layout_constraintBottom_toTopOf="@id/views"
+                app:layout_constraintTop_toBottomOf="@id/attachment"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <ImageView
@@ -122,7 +122,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="content, attachment"
+                app:constraint_referenced_ids="content, attachment, done"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="620dp" />
 

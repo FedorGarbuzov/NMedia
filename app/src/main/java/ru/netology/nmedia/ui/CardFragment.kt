@@ -13,15 +13,16 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
-import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
-import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentCardBinding
 import ru.netology.nmedia.dto.AttachmentType
+import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
+import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.util.AndroidUtils.display
+import ru.netology.nmedia.util.AndroidUtils.loadAvatar
+import ru.netology.nmedia.util.AndroidUtils.loadImage
 import ru.netology.nmedia.viewModel.PostViewModel
 
 @ExperimentalCoroutinesApi
@@ -65,7 +66,7 @@ class CardFragment : Fragment() {
                                         findNavController().navigate(
                                                 R.id.action_cardFragment_to_newPostFragment,
                                                 Bundle().apply {
-                                                    textArg = it.content
+                                                    postArg = it
                                                     viewModel.edit(it)
                                                 })
                                         true
@@ -76,7 +77,7 @@ class CardFragment : Fragment() {
                         }.show()
                     }
 
-                    done?.isVisible = it.ownedByMe
+                    done.isVisible = it.ownedByMe
                     done.isEnabled = it.uploadedToServer
 
                     if (!done.isEnabled) {
@@ -84,22 +85,11 @@ class CardFragment : Fragment() {
                         share.isClickable = false
                     }
 
-                    val url = "$BASE_URL/avatars/${it.authorAvatar}"
-                    Glide.with(binding.postAvatar)
-                            .load(url)
-                            .placeholder(R.drawable.ic_loading_100dp)
-                            .error(R.drawable.ic_error_100dp)
-                            .timeout(10_000)
-                            .circleCrop()
-                            .into(binding.postAvatar)
+                    val avatarUrl = "$BASE_URL/avatars/${it.authorAvatar}"
+                    loadAvatar(binding.postAvatar, avatarUrl)
 
-                    val myUrl = "$BASE_URL/media/${it.attachment?.url}"
-                    Glide.with(binding.attachment)
-                            .load(myUrl)
-                            .placeholder(R.drawable.ic_loading_100dp)
-                            .error(R.drawable.ic_error_100dp)
-                            .timeout(10_000)
-                            .into(binding.attachment)
+                    val mediaUrl = "$BASE_URL/media/${it.attachment?.url}"
+                    loadImage(binding.attachment, mediaUrl)
                 }
 
                 binding.attachment.setOnClickListener { _ ->
@@ -114,8 +104,7 @@ class CardFragment : Fragment() {
                             if (activity?.packageManager?.let { intent.resolveActivity(it) } != null) {
                                 startActivity(intent)
                             } else {
-                                Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT)
-                                        .show()
+                                Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

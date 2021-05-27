@@ -7,15 +7,13 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.BuildConfig.BASE_URL
-import ru.netology.nmedia.R
+import ru.netology.nmedia.databinding.FragmentImageBinding
 import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
 import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
-import ru.netology.nmedia.databinding.FragmentImageBinding
 import ru.netology.nmedia.util.AndroidUtils.display
+import ru.netology.nmedia.util.AndroidUtils.loadImage
 
 class ImageFragment : Fragment() {
 
@@ -27,13 +25,8 @@ class ImageFragment : Fragment() {
     ): View? {
         val binding = FragmentImageBinding.inflate(inflater, container, false)
 
-        val myUrl = "$BASE_URL/media/${arguments?.textArg}"
-        Glide.with(binding.image)
-                .load(myUrl)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .into(binding.image)
+        val mediaUrl = "$BASE_URL/media/${arguments?.textArg}"
+        loadImage(binding.image, mediaUrl)
 
         arguments?.postArg?.let {
             binding.apply {
