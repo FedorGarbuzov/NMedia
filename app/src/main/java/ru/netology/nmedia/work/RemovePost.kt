@@ -1,18 +1,19 @@
 package ru.netology.nmedia.work
 
 import android.content.Context
-import android.content.res.Resources
 import androidx.work.CoroutineWorker
-import androidx.work.WorkManager
+import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.repository.post.PostRepositoryImp
-import ru.netology.nmedia.work.SavePostWorker.Companion.postKey
-import java.lang.NullPointerException
+import ru.netology.nmedia.repository.post.PostRepository
+import ru.netology.nmedia.work.SavePostsWorker.Companion.postKey
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RemovePostWorker(
+class RemovePostsWorker(
         applicationContext: Context,
         params: WorkerParameters,
+        private val repository: PostRepository
 ) : CoroutineWorker(applicationContext, params) {
 
     override suspend fun doWork(): Result {
@@ -21,16 +22,26 @@ class RemovePostWorker(
             Result.failure()
         }
 
-        val repository = PostRepositoryImp(
-                AppDb.getInstance(applicationContext).postDao(),
-                AppDb.getInstance(applicationContext).postWorkDao()
-        )
-
         return try {
             repository.removeByIdWork(id)
             Result.success()
         } catch (e: Exception) {
             Result.retry()
         }
+    }
+}
+
+@Singleton
+class RemovePostsWorkerFactory @Inject constructor(
+    private val repository: PostRepository
+) : WorkerFactory() {
+    override fun createWorker(
+        appContext: Context,
+        workerClassName: String,
+        workerParameters: WorkerParameters
+    ): ListenableWorker? = when (workerClassName) {
+        RemovePostsWorker::class.java.name ->
+            RemovePostsWorker(appContext, workerParameters, repository)
+        else -> null
     }
 }
