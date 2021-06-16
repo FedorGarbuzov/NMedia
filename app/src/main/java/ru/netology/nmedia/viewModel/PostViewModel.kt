@@ -5,14 +5,13 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.core.net.toFile
 import androidx.lifecycle.*
+import androidx.paging.*
 import androidx.work.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
@@ -55,16 +54,23 @@ class PostViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    val data: LiveData<FeedModel> = auth.authStateFlow
-        .flatMapLatest { (myId, _) ->
-            repository.data
-                .map { posts ->
-                    FeedModel(
-                        posts.map { it.copy(ownedByMe = it.authorId == myId) },
-                        posts.isEmpty()
-                    )
-                }
+    private val dbPosts: LiveData<FeedModel> =
+        repository.dbPosts.map { posts ->
+                FeedModel(posts, posts.isEmpty())
         }.asLiveData(Dispatchers.Default)
+
+    private val cached = repository
+        .data
+        .cachedIn(viewModelScope)
+
+    val data: Flow<PagingData<Post>> = auth.authStateFlow
+        .flatMapLatest { (myId, _) ->
+            cached.map { pagingData ->
+                pagingData.map { post ->
+                    post.copy(ownedByMe = post.authorId == myId)
+                }
+            }
+        }
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
@@ -76,7 +82,7 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    val getNewer: LiveData<List<Post>> = data.switchMap {
+    val getNewer: LiveData<List<Post>> = dbPosts.switchMap {
         repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
             .catch { e -> e.printStackTrace() }
             .asLiveData()

@@ -10,10 +10,13 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInterractionListener
 import ru.netology.nmedia.adapter.PostAdapter
@@ -143,6 +146,10 @@ class FeedFragment : Fragment() {
             }
         })
 
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest(adapter::submitData)
+        }
+
         binding.postsList.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner,
                 { state ->
@@ -152,31 +159,24 @@ class FeedFragment : Fragment() {
                     binding.swipeRefresh.isRefreshing = state.refreshing
                 })
 
-        viewModel.data.observe(viewLifecycleOwner,
-                { state ->
-                    adapter.submitList(state.posts)
-                    binding.emptyText.isVisible = state.empty
-                })
-
-//        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
-//            if (state.isNotEmpty()) {
-//                binding.newer.visibility = View.VISIBLE
-//                binding.newer.setOnClickListener {
-//                    viewModel.loadNewer()
-//                    binding.newer.visibility = View.GONE
-//                }
-//            }
-//        }
-
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(
-                    positionStart: Int,
-                    itemCount: Int,
-            ) {
-                binding.postsList.scrollToPosition(0)
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swipeRefresh.isRefreshing =
+                    state.refresh is LoadState.Loading ||
+                            state.prepend is LoadState.Loading ||
+                            state.append is LoadState.Loading
             }
-        })
+        }
 
+        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
+            if (state.isNotEmpty()) {
+                binding.newer.visibility = View.VISIBLE
+                binding.newer.setOnClickListener {
+                    viewModel.loadNewer()
+                    binding.newer.visibility = View.GONE
+                }
+            }
+        }
 
         binding.retryLoadingButton.setOnClickListener {
             viewModel.loadPosts()
@@ -187,8 +187,16 @@ class FeedFragment : Fragment() {
         }
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadPosts()
+            adapter.refresh()
             binding.swipeRefresh.isRefreshing = false
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(
+                    positionStart: Int,
+                    itemCount: Int,
+                ) {
+                    binding.postsList.scrollToPosition(0)
+                }
+            })
         }
 
         binding.add.setOnClickListener {
