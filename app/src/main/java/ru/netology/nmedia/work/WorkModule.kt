@@ -1,6 +1,7 @@
 package ru.netology.nmedia.work
 
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import dagger.Module
@@ -17,7 +18,7 @@ object WorkModule {
     @Singleton
     fun provideWorkManager(
         @ApplicationContext context: Context,
-        workerFactory: DependencyWorkerFactory,
+        workerFactory: HiltWorkerFactory,
     ): WorkManager {
         WorkManager.initialize(
             context, Configuration.Builder()

@@ -24,15 +24,17 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 @AndroidEntryPoint
-class FCMService @Inject constructor(
-    private val repository: PostRepository
-) : FirebaseMessagingService() {
+class FCMService : FirebaseMessagingService() {
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+
     @Inject
     lateinit var auth: AppAuth
+
+    @Inject
+    lateinit var repository: PostRepository
 
     override fun onCreate() {
         super.onCreate()
