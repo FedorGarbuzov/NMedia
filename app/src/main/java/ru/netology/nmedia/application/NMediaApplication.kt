@@ -1,6 +1,7 @@
 package ru.netology.nmedia.application
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope

@@ -1,9 +1,11 @@
 package ru.netology.nmedia.ui
 
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.hilt.work.HiltWorkerFactory
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
@@ -16,6 +18,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     @Inject
     lateinit var firebaseMessaging: FirebaseMessaging
+
     @Inject
     lateinit var googleApiAvailability: GoogleApiAvailability
 

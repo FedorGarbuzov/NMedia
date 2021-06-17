@@ -83,7 +83,7 @@ dependencies {
     def okhttploggin_version = "4.9.1"
     def coroutines_version = "1.4.3"
     def imagepicker_version = "2.0"
-    def workmanager_version = "2.5.0"
+    def workmanager_version = "2.6.0-alpha01"
     def hilt_work_version = "1.0.0"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
@@ -123,4 +123,5 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "androidx.hilt:hilt-work:$hilt_work_version"
+    kapt "androidx.hilt:hilt-compiler:$hilt_work_version"
 }
