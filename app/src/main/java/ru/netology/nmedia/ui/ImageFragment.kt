@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.databinding.FragmentImageBinding
@@ -15,6 +16,7 @@ import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.util.AndroidUtils.display
 import ru.netology.nmedia.util.AndroidUtils.loadImage
 
+@AndroidEntryPoint
 class ImageFragment : Fragment() {
 
     @ExperimentalCoroutinesApi

@@ -1,28 +1,30 @@
 package ru.netology.nmedia.work
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.repository.post.PostRepositoryImp
-import java.lang.Exception
+import ru.netology.nmedia.repository.post.PostRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RefreshPostsWorker(
-        applicationContext: Context,
-        params: WorkerParameters,
+@HiltWorker
+class RefreshPostsWorker @AssistedInject constructor(
+    @Assisted applicationContext: Context,
+    @Assisted params: WorkerParameters,
+    private val repository: PostRepository
 ) : CoroutineWorker(applicationContext, params) {
     companion object {
         const val name = "ru.netology.work.RefreshPostsWorker"
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.Default) {
-        val repository = PostRepositoryImp(
-                AppDb.getInstance(context = applicationContext).postDao(),
-                AppDb.getInstance(context = applicationContext).postWorkDao()
-        )
-
         try {
             repository.getAll()
             Result.success()
@@ -30,5 +32,20 @@ class RefreshPostsWorker(
             e.printStackTrace()
             Result.retry()
         }
+    }
+}
+
+@Singleton
+class RefreshPostsWorkerFactory @Inject constructor(
+    private val repository: PostRepository
+) : WorkerFactory() {
+    override fun createWorker(
+        appContext: Context,
+        workerClassName: String,
+        workerParameters: WorkerParameters
+    ): ListenableWorker? = when (workerClassName) {
+        RefreshPostsWorker::class.java.name ->
+            RefreshPostsWorker(appContext, workerParameters, repository)
+        else -> null
     }
 }
