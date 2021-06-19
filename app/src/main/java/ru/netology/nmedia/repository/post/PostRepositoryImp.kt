@@ -2,12 +2,13 @@ package ru.netology.nmedia.repository.post
 
 import android.net.Uri
 import androidx.core.net.toFile
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import ru.netology.nmedia.api.PostApi
+import ru.netology.nmedia.api.PostApiService
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dao.PostWorkDao
 import ru.netology.nmedia.dto.*
@@ -20,34 +21,43 @@ import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PostRepositoryImp(
-        private val dao: PostDao,
-        private val postWorkDao: PostWorkDao,
+@Singleton
+class PostRepositoryImp @Inject constructor(
+    private val postDao: PostDao,
+    private val postWorkDao: PostWorkDao,
+    private val postApi: PostApiService,
 ) : PostRepository {
-    override val data = dao.getAll()
-            .map(List<PostEntity>::toPost)
-            .flowOn(Dispatchers.Default)
+
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+        pagingSourceFactory = { PostPagingSource(postApi) }
+    ).flow
+
+    override val dbPosts = postDao.getAll()
+        .map(List<PostEntity>::toPost)
 
     override fun getNewer(id: Long): Flow<List<Post>> = flow {
         while (true) {
-            delay(10_000L)
-            val response = PostApi.retrofitService.getNewer(id)
+            delay(120_000L)
+            val response = postApi.getNewer(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.fromPost())
+            postDao.insert(body.fromPost())
             emit(body)
         }
     }
-            .catch { e -> throw AppError.from(e) }
-            .flowOn(Dispatchers.Default)
+        .catch { e -> throw AppError.from(e) }
+        .flowOn(Dispatchers.Default)
 
     override suspend fun loadNewer() {
-        val newer = dao.getNewer()
-        dao.insert(newer.map {
+        val newer = postDao.getNewer()
+        postDao.insert(newer.map {
             it.copy(uploadedToServer = true, read = true)
         })
     }
@@ -55,13 +65,13 @@ class PostRepositoryImp(
     override suspend fun getAll() {
         try {
             delay(1000)
-            val response = PostApi.retrofitService.getAll()
+            val response = postApi.getAll()
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.fromPost().map {
+            postDao.insert(body.fromPost().map {
                 it.copy(uploadedToServer = true, read = true)
             })
         } catch (e: IOException) {
@@ -74,10 +84,10 @@ class PostRepositoryImp(
     override suspend fun upload(upload: MediaUpload): Media {
         try {
             val media = MultipartBody.Part.createFormData(
-                    "file", upload.file.name, upload.file.asRequestBody()
+                "file", upload.file.name, upload.file.asRequestBody()
             )
 
-            val response = PostApi.retrofitService.upload(media)
+            val response = postApi.upload(media)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -91,11 +101,11 @@ class PostRepositoryImp(
     }
 
     override suspend fun likedByMe(id: Long) {
-        dao.likedByMe(id)
+        postDao.likedByMe(id)
         try {
-            val response = PostApi.retrofitService.likedByMe(id)
+            val response = postApi.likedByMe(id)
             if (!response.isSuccessful) {
-                dao.unlikedByMe(id)
+                postDao.unlikedByMe(id)
                 throw ApiError(response.code(), response.message())
             }
         } catch (e: IOException) {
@@ -106,11 +116,11 @@ class PostRepositoryImp(
     }
 
     override suspend fun unlikedByMe(id: Long) {
-        dao.unlikedByMe(id)
+        postDao.unlikedByMe(id)
         try {
-            val response = PostApi.retrofitService.unlikedByMe(id)
+            val response = postApi.unlikedByMe(id)
             if (!response.isSuccessful) {
-                dao.likedByMe(id)
+                postDao.likedByMe(id)
                 throw ApiError(response.code(), response.message())
             }
         } catch (e: IOException) {
@@ -148,13 +158,13 @@ class PostRepositoryImp(
             if (entity.uri != null) {
                 val upload = MediaUpload(Uri.parse(entity.uri).toFile())
                 post = post.copy(
-                        attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
+                    attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
                 )
             }
-            val edited = data.first()
-                    .find { it.id == post.id && it.authorId == post.authorId }
-            val old = data.first()
-                    .find { it.content == post.content && it.attachment == post.attachment }
+            val edited = dbPosts.first()
+                .find { it.id == post.id && it.authorId == post.authorId }
+            val old = dbPosts.first()
+                .find { it.content == post.content && it.attachment == post.attachment}
             when {
                 old != null -> {
                     uploadToServer(old)
@@ -174,13 +184,13 @@ class PostRepositoryImp(
     }
 
     override suspend fun removeByIdWork(id: Long) {
-        val post = data.first()
-                .find { it.id == id }
-        dao.removeById(id)
+        val post = dbPosts.first()
+            .find { it.id == id }
+        postDao.removeById(id)
         try {
-            val response = PostApi.retrofitService.removeById(id)
+            val response = postApi.removeById(id)
             if (!response.isSuccessful) {
-                if (post != null) dao.insert(PostEntity.fromPost(post))
+                if (post != null) postDao.insert(PostEntity.fromPost(post))
                 throw ApiError(response.code(), response.message())
             }
         } catch (e: IOException) {
@@ -192,12 +202,12 @@ class PostRepositoryImp(
 
     private suspend fun uploadToServer(post: Post) {
         try {
-            val response = PostApi.retrofitService.save(post)
+            val response = postApi.save(post)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
+            postDao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -206,14 +216,14 @@ class PostRepositoryImp(
     }
 
     private suspend fun editPost(post: Post, edited: Post) {
-        dao.insert(PostEntity.fromPost(post.copy(uploadedToServer = false, read = true)))
+        postDao.insert(PostEntity.fromPost(post.copy(uploadedToServer = false, read = true)))
         try {
-            val response = PostApi.retrofitService.save(edited.copy(content = post.content))
+            val response = postApi.save(edited.copy(content = post.content))
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
+            postDao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -222,14 +232,14 @@ class PostRepositoryImp(
     }
 
     private suspend fun savePost(post: Post) {
-        dao.insert(PostEntity.fromPost(post.copy(uploadedToServer = false, read = true)))
+        postDao.insert(PostEntity.fromPost(post.copy(uploadedToServer = false, read = true)))
         try {
-            val response = PostApi.retrofitService.save(post)
+            val response = postApi.save(post)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
+            postDao.insert(PostEntity.fromPost(body.copy(uploadedToServer = true, read = true)))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

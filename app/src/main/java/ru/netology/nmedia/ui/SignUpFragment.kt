@@ -12,11 +12,13 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.databinding.FragmentSignUpBinding
 import ru.netology.nmedia.viewModel.SignUpViewModel
 
+@AndroidEntryPoint
 class SignUpFragment : DialogFragment() {
     private val viewModel: SignUpViewModel by viewModels(
             ownerProducer = ::requireParentFragment

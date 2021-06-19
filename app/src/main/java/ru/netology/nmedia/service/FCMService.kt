@@ -11,24 +11,30 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import ru.netology.nmedia.ui.AppActivity
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.post.PostRepository
-import ru.netology.nmedia.repository.post.PostRepositoryImp
+import ru.netology.nmedia.ui.AppActivity
+import javax.inject.Inject
 import kotlin.random.Random
 
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+
+    @Inject
+    lateinit var auth: AppAuth
+
+    @Inject
+    lateinit var repository: PostRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -46,7 +52,7 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         CoroutineScope(Dispatchers.Default).launch {
-            val userId = AppAuth.getInstance().authStateFlow.value.id
+            val userId = auth.authStateFlow.value.id
             val remoteId = gson.fromJson(
                     message.data[content],
                     Message::class.java
@@ -83,7 +89,7 @@ class FCMService : FirebaseMessagingService() {
                     e.printStackTrace()
                 }
             } else {
-                AppAuth.getInstance().sendPushToken()
+                auth.sendPushToken()
             }
         }
     }
@@ -91,7 +97,7 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         println(token)
-        AppAuth.getInstance().sendPushToken(token)
+        auth.sendPushToken(token)
     }
 
     private suspend fun handleLike(content: RemoteClass) {
@@ -111,7 +117,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().likeById(content.postId)
+        repository.likeById(content.postId)
     }
 
     private suspend fun handleShare(content: RemoteClass) {
@@ -131,7 +137,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().shareById(content.postId)
+        repository.shareById(content.postId)
     }
 
     private suspend fun handlePost(content: Post) {
@@ -152,7 +158,7 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(this)
                 .notify(Random.nextInt(100_000), notification)
-        getRepository().processWork(content.id)
+        repository.processWork(content.id)
 
     }
 
@@ -169,13 +175,6 @@ class FCMService : FirebaseMessagingService() {
 
         NotificationManagerCompat.from(applicationContext)
                 .notify(Random.nextInt(100_000), notification)
-    }
-
-    private fun getRepository(): PostRepository {
-        return PostRepositoryImp(
-                AppDb.getInstance(context = application).postDao(),
-                AppDb.getInstance(context = application).postWorkDao()
-        )
     }
 
     private fun getPendingIntent(): PendingIntent {

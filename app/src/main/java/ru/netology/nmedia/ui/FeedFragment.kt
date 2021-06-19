@@ -11,25 +11,33 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
-import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
-import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInterractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.ui.NewPostFragment.Companion.postArg
+import ru.netology.nmedia.ui.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
             ownerProducer = ::requireParentFragment
     )
+    @Inject
+    lateinit var auth: AppAuth
     private val authViewModel: AuthViewModel by viewModels()
 
     val Fragment.packageManager: PackageManager?
@@ -56,7 +64,7 @@ class FeedFragment : Fragment() {
                 true
             }
             R.id.signout -> {
-                AppAuth.getInstance().removeAuth()
+                auth.removeAuth()
                 true
             }
             R.id.signup -> {
@@ -139,6 +147,10 @@ class FeedFragment : Fragment() {
             }
         })
 
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest(adapter::submitData)
+        }
+
         binding.postsList.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner,
                 { state ->
@@ -147,14 +159,13 @@ class FeedFragment : Fragment() {
                     binding.errorSavingGroup.isVisible = state.errorSaving
                     binding.swipeRefresh.isRefreshing = state.refreshing
                 })
-
+        
         viewModel.data.observe(viewLifecycleOwner,
                 { state ->
                     adapter.submitList(state.posts)
                     binding.emptyText.isVisible = state.empty
                 })
 
-<<<<<<< Updated upstream
 //        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
 //            if (state.isNotEmpty()) {
 //                binding.newer.visibility = View.VISIBLE
@@ -171,7 +182,7 @@ class FeedFragment : Fragment() {
                     itemCount: Int,
             ) {
                 binding.postsList.scrollToPosition(0)
-=======
+
         authViewModel.data.observe(viewLifecycleOwner) {
             activity?.invalidateOptionsMenu()
         }
@@ -183,10 +194,25 @@ class FeedFragment : Fragment() {
                     viewModel.loadNewer()
                     binding.newer.visibility = View.GONE
                 }
->>>>>>> Stashed changes
+                
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swipeRefresh.isRefreshing =
+                    state.refresh is LoadState.Loading ||
+                            state.prepend is LoadState.Loading ||
+                            state.append is LoadState.Loading
             }
-        })
+        }
 
+        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
+            if (state.isNotEmpty()) {
+                binding.newer.visibility = View.VISIBLE
+                binding.newer.setOnClickListener {
+                    viewModel.loadNewer()
+                    binding.newer.visibility = View.GONE
+                }
+            }
+        }
 
         binding.retryLoadingButton.setOnClickListener {
             viewModel.loadPosts()
@@ -197,8 +223,16 @@ class FeedFragment : Fragment() {
         }
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadPosts()
+            adapter.refresh()
             binding.swipeRefresh.isRefreshing = false
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(
+                    positionStart: Int,
+                    itemCount: Int,
+                ) {
+                    binding.postsList.scrollToPosition(0)
+                }
+            })
         }
 
         binding.add.setOnClickListener {

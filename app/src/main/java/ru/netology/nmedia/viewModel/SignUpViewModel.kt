@@ -12,18 +12,18 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.R
-import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.dto.MediaUpload
+import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.repository.user.UserRepository
-import ru.netology.nmedia.repository.user.UserRepositoryImp
 import ru.netology.nmedia.util.SingleLiveEvent
-import java.io.File
-import java.lang.Exception
+import javax.inject.Inject
 
 private val noPhoto = PhotoModel()
 
-class SignUpViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: UserRepository = UserRepositoryImp()
+class SignUpViewModel @Inject constructor(
+    private val repository: UserRepository,
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _registered = SingleLiveEvent<Unit>()
     val registered: LiveData<Unit>

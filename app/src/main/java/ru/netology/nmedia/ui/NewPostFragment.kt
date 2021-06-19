@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
@@ -23,8 +24,10 @@ import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.AndroidUtils.loadImage
 import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
+import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
+@AndroidEntryPoint
 class NewPostFragment : Fragment() {
 
     companion object {
@@ -42,6 +45,8 @@ class NewPostFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
             ownerProducer = ::requireParentFragment
     )
+    @Inject
+    lateinit var auth: AppAuth
     private val authViewModel: AuthViewModel by viewModels()
 
     private var fragmentBinding: FragmentNewPostBinding? = null
@@ -83,7 +88,7 @@ class NewPostFragment : Fragment() {
                 dialog
                         ?.setMessage(R.string.cancelation)
                         ?.setPositiveButton(R.string.dialog_positive) { dialog, int ->
-                            AppAuth.getInstance().removeAuth()
+                            auth.removeAuth()
                             dialog.dismiss()
                             findNavController().navigateUp()
 
