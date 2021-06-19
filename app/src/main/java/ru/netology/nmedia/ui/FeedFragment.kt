@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -153,6 +154,7 @@ class FeedFragment : Fragment() {
                     binding.emptyText.isVisible = state.empty
                 })
 
+<<<<<<< Updated upstream
 //        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
 //            if (state.isNotEmpty()) {
 //                binding.newer.visibility = View.VISIBLE
@@ -169,6 +171,19 @@ class FeedFragment : Fragment() {
                     itemCount: Int,
             ) {
                 binding.postsList.scrollToPosition(0)
+=======
+        authViewModel.data.observe(viewLifecycleOwner) {
+            activity?.invalidateOptionsMenu()
+        }
+
+        viewModel.getNewer.observe(viewLifecycleOwner) { state ->
+            if (state.isNotEmpty()) {
+                binding.newer.visibility = View.VISIBLE
+                binding.newer.setOnClickListener {
+                    viewModel.loadNewer()
+                    binding.newer.visibility = View.GONE
+                }
+>>>>>>> Stashed changes
             }
         })
 
