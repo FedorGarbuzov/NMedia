@@ -2,6 +2,7 @@ package ru.netology.nmedia.dao
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -16,6 +17,9 @@ import java.time.format.DateTimeFormatter
 interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE read == 1 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * FROM PostEntity WHERE read == 1 ORDER BY id DESC")
+    fun pagingSource(): PagingSource<Int, PostEntity>
 
     @Query("SELECT * FROM PostEntity WHERE read == 0 ORDER BY id DESC")
     suspend fun getNewer(): List<PostEntity>
@@ -79,4 +83,7 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
+
+    @Query("DELETE FROM PostEntity")
+    suspend fun removeAll()
 }

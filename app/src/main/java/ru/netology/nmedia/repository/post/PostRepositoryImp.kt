@@ -10,7 +10,9 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.PostApiService
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dao.PostRemoteKeyDao
 import ru.netology.nmedia.dao.PostWorkDao
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.*
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostWorkEntity
@@ -26,15 +28,21 @@ import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryImp @Inject constructor(
+    appDb: AppDb,
     private val postDao: PostDao,
     private val postWorkDao: PostWorkDao,
     private val postApi: PostApiService,
+    postRemoteKeyDao: PostRemoteKeyDao
 ) : PostRepository {
 
+    @OptIn(ExperimentalPagingApi::class)
     override val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-        pagingSourceFactory = { PostPagingSource(postApi) }
-    ).flow
+        config = PagingConfig(pageSize = 10),
+        remoteMediator = PostRemoteMediator(postApi, appDb, postDao, postRemoteKeyDao),
+        pagingSourceFactory = postDao::pagingSource,
+    ).flow.map { pagingData ->
+        pagingData.map(PostEntity::toPost)
+    }
 
     override val dbPosts = postDao.getAll()
         .map(List<PostEntity>::toPost)
