@@ -2,6 +2,7 @@ package ru.netology.nmedia.repository.post
 
 import android.net.Uri
 import androidx.core.net.toFile
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -29,13 +30,18 @@ class PostRepositoryImp @Inject constructor(
     private val postWorkDao: PostWorkDao,
     private val postApi: PostApiService,
 ) : PostRepository {
-    override val data = postDao.getAll()
+
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+        pagingSourceFactory = { PostPagingSource(postApi) }
+    ).flow
+
+    override val dbPosts = postDao.getAll()
         .map(List<PostEntity>::toPost)
-        .flowOn(Dispatchers.Default)
 
     override fun getNewer(id: Long): Flow<List<Post>> = flow {
         while (true) {
-            delay(10_000L)
+            delay(120_000L)
             val response = postApi.getNewer(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
@@ -155,10 +161,10 @@ class PostRepositoryImp @Inject constructor(
                     attachment = Attachment(upload(upload).id, AttachmentType.IMAGE)
                 )
             }
-            val edited = data.first()
+            val edited = dbPosts.first()
                 .find { it.id == post.id && it.authorId == post.authorId }
-            val old = data.first()
-                .find { it.content == post.content && it.attachment == post.attachment }
+            val old = dbPosts.first()
+                .find { it.content == post.content && it.attachment == post.attachment}
             when {
                 old != null -> {
                     uploadToServer(old)
@@ -178,7 +184,7 @@ class PostRepositoryImp @Inject constructor(
     }
 
     override suspend fun removeByIdWork(id: Long) {
-        val post = data.first()
+        val post = dbPosts.first()
             .find { it.id == id }
         postDao.removeById(id)
         try {
