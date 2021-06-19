@@ -168,6 +168,10 @@ class FeedFragment : Fragment() {
             }
         }
 
+        authViewModel.data.observe(viewLifecycleOwner) {
+            activity?.invalidateOptionsMenu()
+        }
+
         viewModel.getNewer.observe(viewLifecycleOwner) { state ->
             if (state.isNotEmpty()) {
                 binding.newer.visibility = View.VISIBLE
