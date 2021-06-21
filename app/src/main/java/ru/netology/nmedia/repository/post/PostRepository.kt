@@ -14,7 +14,7 @@ interface PostRepository {
     suspend fun loadNewer()
     suspend fun likeById(id: Long)
     suspend fun shareById(id: Long)
-//    suspend fun getAll()
+    suspend fun getAfter()
     suspend fun getLatest()
     suspend fun removeByIdWork(id: Long)
     suspend fun likedByMe(id: Long)
