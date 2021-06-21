@@ -35,9 +35,11 @@ class PostRepositoryImp @Inject constructor(
     postRemoteKeyDao: PostRemoteKeyDao
 ) : PostRepository {
 
+    private val pageSize = 20
+
     @OptIn(ExperimentalPagingApi::class)
     override val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 10),
+        config = PagingConfig(pageSize),
         remoteMediator = PostRemoteMediator(postApi, appDb, postDao, postRemoteKeyDao),
         pagingSourceFactory = postDao::pagingSource,
     ).flow.map { pagingData ->
@@ -70,10 +72,10 @@ class PostRepositoryImp @Inject constructor(
         })
     }
 
-    override suspend fun getAll() {
+    override suspend fun getLatest() {
         try {
             delay(1000)
-            val response = postApi.getAll()
+            val response = postApi.getLatest(pageSize)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
