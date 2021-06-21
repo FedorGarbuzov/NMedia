@@ -14,10 +14,7 @@ import ru.netology.nmedia.dao.PostRemoteKeyDao
 import ru.netology.nmedia.dao.PostWorkDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.*
-import ru.netology.nmedia.entity.PostEntity
-import ru.netology.nmedia.entity.PostWorkEntity
-import ru.netology.nmedia.entity.fromPost
-import ru.netology.nmedia.entity.toPost
+import ru.netology.nmedia.entity.*
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
@@ -32,7 +29,7 @@ class PostRepositoryImp @Inject constructor(
     private val postDao: PostDao,
     private val postWorkDao: PostWorkDao,
     private val postApi: PostApiService,
-    postRemoteKeyDao: PostRemoteKeyDao
+    private val postRemoteKeyDao: PostRemoteKeyDao
 ) : PostRepository {
 
     private val pageSize = 20
@@ -74,13 +71,37 @@ class PostRepositoryImp @Inject constructor(
 
     override suspend fun getLatest() {
         try {
-            delay(1000)
             val response = postApi.getLatest(pageSize)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
+            postDao.insert(body.fromPost().map {
+                it.copy(uploadedToServer = true, read = true)
+            })
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun getAfter() {
+        try {
+            val id = postDao.getId()
+            val response = postApi.getAfter(id, pageSize)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            postRemoteKeyDao.insert(
+                PostRemoteKeyEntity(
+                    PostRemoteKeyEntity.KeyType.AFTER,
+                    body.first().id
+                )
+            )
             postDao.insert(body.fromPost().map {
                 it.copy(uploadedToServer = true, read = true)
             })

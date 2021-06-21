@@ -104,7 +104,7 @@ class PostViewModel @Inject constructor(
         try {
             delay(2000)
             _dataState.value = FeedModelState(loading = true)
-//            repository.getAll()
+            repository.getLatest()
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(errorLoading = true)
