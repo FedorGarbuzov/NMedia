@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dto.Ad
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
@@ -26,6 +28,7 @@ import ru.netology.nmedia.work.RemovePostsWorker
 import ru.netology.nmedia.work.SavePostsWorker
 import ru.netology.nmedia.work.SavePostsWorker.Companion.postKey
 import javax.inject.Inject
+import kotlin.random.Random
 
 val emptyPost = Post(
     id = 0L,
@@ -61,13 +64,25 @@ class PostViewModel @Inject constructor(
 
     private val cached = repository
         .data
+        .map { pagingData ->
+            pagingData.insertSeparators(
+                generator = { before, after ->
+                    if (before?.id?.rem(5) != 0L) null else
+                        Ad(
+                            Random.nextLong(),
+                            "https://netology.ru",
+                            "figma.jpg"
+                        )
+                }
+            )
+        }
         .cachedIn(viewModelScope)
 
-    val data: Flow<PagingData<Post>> = auth.authStateFlow
+    val data: Flow<PagingData<FeedItem>> = auth.authStateFlow
         .flatMapLatest { (myId, _) ->
             cached.map { pagingData ->
-                pagingData.map { post ->
-                    post.copy(ownedByMe = post.authorId == myId)
+                pagingData.map { item ->
+                    if(item !is Post) item else item.copy(ownedByMe = item.authorId == myId)
                 }
             }
         }
