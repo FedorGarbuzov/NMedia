@@ -33,8 +33,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
-            ownerProducer = ::requireParentFragment
+        ownerProducer = ::requireParentFragment
     )
+
     @Inject
     lateinit var auth: AppAuth
     private val authViewModel: AuthViewModel by viewModels()
@@ -77,9 +78,9 @@ class FeedFragment : Fragment() {
     @ExperimentalCoroutinesApi
     @SuppressLint("ResourceType", "ShowToast", "SetTextI18n")
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
 
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
@@ -87,7 +88,9 @@ class FeedFragment : Fragment() {
         val adapter = PostAdapter(object : OnInterractionListener {
             override fun onLike(post: Post) {
                 if (authViewModel.authenticated) {
-                    if (!post.likedByMe) viewModel.likedByMe(post.id) else viewModel.unlikedByMe(post.id)
+                    if (!post.likedByMe) viewModel.likedByMe(post.id) else viewModel.unlikedByMe(
+                        post.id
+                    )
                 } else {
                     SignInFragment().show(parentFragmentManager, "Dialog")
                 }
@@ -106,12 +109,12 @@ class FeedFragment : Fragment() {
 
             override fun onEdit(post: Post) {
                 findNavController().navigate(
-                        R.id.action_feedFragment_to_newPostFragment,
-                        Bundle().apply {
-                            textArg = post.content
-                            postArg = post
-                            viewModel.edit(post)
-                        })
+                    R.id.action_feedFragment_to_newPostFragment,
+                    Bundle().apply {
+                        textArg = post.content
+                        postArg = post
+                        viewModel.edit(post)
+                    })
             }
 
             override fun onRemove(post: Post) {
@@ -121,17 +124,18 @@ class FeedFragment : Fragment() {
             override fun onPlayMedia(post: Post) {
                 when (post.attachment?.type) {
                     AttachmentType.IMAGE -> findNavController().navigate(
-                            R.id.action_feedFragment_to_imageFragment,
-                            Bundle().apply {
-                                textArg = post.attachment.url
-                                postArg = post
-                            })
+                        R.id.action_feedFragment_to_imageFragment,
+                        Bundle().apply {
+                            textArg = post.attachment.url
+                            postArg = post
+                        })
                     else -> {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.attachment?.url))
                         if (packageManager?.let { intent.resolveActivity(it) } != null) {
                             startActivity(intent)
                         } else {
-                            Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(activity, R.string.app_not_found, Toast.LENGTH_SHORT)
+                                .show()
                         }
                     }
                 }
@@ -139,10 +143,10 @@ class FeedFragment : Fragment() {
 
             override fun onOpenCard(post: Post) {
                 findNavController().navigate(
-                        R.id.action_feedFragment_to_cardFragment,
-                        Bundle().apply {
-                            postArg = post
-                        })
+                    R.id.action_feedFragment_to_cardFragment,
+                    Bundle().apply {
+                        postArg = post
+                    })
             }
         })
 
@@ -152,12 +156,12 @@ class FeedFragment : Fragment() {
 
         binding.postsList.adapter = adapter
         viewModel.dataState.observe(viewLifecycleOwner,
-                { state ->
-                    binding.progress.isVisible = state.loading
-                    binding.errorLoadingGroup.isVisible = state.errorLoading
-                    binding.errorSavingGroup.isVisible = state.errorSaving
-                    binding.swipeRefresh.isRefreshing = state.refreshing
-                })
+            { state ->
+                binding.progress.isVisible = state.loading
+                binding.errorLoadingGroup.isVisible = state.errorLoading
+                binding.errorSavingGroup.isVisible = state.errorSaving
+                binding.swipeRefresh.isRefreshing = state.refreshing
+            })
 
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { state ->

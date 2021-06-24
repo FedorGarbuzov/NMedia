@@ -2,6 +2,7 @@ package ru.netology.nmedia.work
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
+import androidx.paging.LoadType
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
@@ -10,6 +11,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.repository.post.PostRemoteMediator
 import ru.netology.nmedia.repository.post.PostRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,7 +29,7 @@ class RefreshPostsWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.Default) {
         try {
-            repository.getAll()
+            repository.getAfter()
             Result.success()
         } catch (e: Exception) {
             e.printStackTrace()

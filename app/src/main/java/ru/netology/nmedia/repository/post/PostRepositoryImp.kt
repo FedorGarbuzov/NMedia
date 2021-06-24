@@ -10,12 +10,11 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.PostApiService
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dao.PostRemoteKeyDao
 import ru.netology.nmedia.dao.PostWorkDao
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.*
-import ru.netology.nmedia.entity.PostEntity
-import ru.netology.nmedia.entity.PostWorkEntity
-import ru.netology.nmedia.entity.fromPost
-import ru.netology.nmedia.entity.toPost
+import ru.netology.nmedia.entity.*
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
@@ -26,15 +25,23 @@ import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryImp @Inject constructor(
+    appDb: AppDb,
     private val postDao: PostDao,
     private val postWorkDao: PostWorkDao,
     private val postApi: PostApiService,
+    private val postRemoteKeyDao: PostRemoteKeyDao
 ) : PostRepository {
 
+    private val pageSize = 20
+
+    @OptIn(ExperimentalPagingApi::class)
     override val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-        pagingSourceFactory = { PostPagingSource(postApi) }
-    ).flow
+        config = PagingConfig(pageSize),
+        remoteMediator = PostRemoteMediator(postApi, appDb, postDao, postRemoteKeyDao),
+        pagingSourceFactory = postDao::pagingSource,
+    ).flow.map { pagingData ->
+        pagingData.map(PostEntity::toPost)
+    }
 
     override val dbPosts = postDao.getAll()
         .map(List<PostEntity>::toPost)
@@ -62,10 +69,9 @@ class PostRepositoryImp @Inject constructor(
         })
     }
 
-    override suspend fun getAll() {
+    override suspend fun getLatest() {
         try {
-            delay(1000)
-            val response = postApi.getAll()
+            val response = postApi.getLatest(pageSize)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -74,6 +80,33 @@ class PostRepositoryImp @Inject constructor(
             postDao.insert(body.fromPost().map {
                 it.copy(uploadedToServer = true, read = true)
             })
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun getAfter() {
+        try {
+            val id = postRemoteKeyDao.max()
+            id?.let { id ->
+                val response = postApi.getAfter(id, pageSize)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+                postRemoteKeyDao.insert(
+                    PostRemoteKeyEntity(
+                        PostRemoteKeyEntity.KeyType.AFTER,
+                        body.first().id
+                    )
+                )
+                postDao.insert(body.fromPost().map {
+                    it.copy(uploadedToServer = true, read = true)
+                })
+            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
