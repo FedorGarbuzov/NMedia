@@ -2,6 +2,7 @@ package ru.netology.nmedia.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,6 +28,7 @@ import ru.netology.nmedia.util.AndroidUtils.loadAvatar
 import ru.netology.nmedia.util.AndroidUtils.loadImage
 import ru.netology.nmedia.viewModel.PostViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalCoroutinesApi::class)
 @AndroidEntryPoint
 class CardFragment : Fragment() {
