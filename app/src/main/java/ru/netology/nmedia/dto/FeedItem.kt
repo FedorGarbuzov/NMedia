@@ -13,6 +13,11 @@ data class Ad(
     val image: String,
 ) : FeedItem()
 
+data class Date(
+    override val id: Long,
+    val text: Int
+): FeedItem()
+
 data class Post(
     override val id: Long,
     val author: String,

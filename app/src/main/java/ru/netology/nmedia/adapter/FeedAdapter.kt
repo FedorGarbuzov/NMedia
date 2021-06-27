@@ -9,12 +9,13 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.AdCardBinding
+import ru.netology.nmedia.databinding.DateCardBinding
 import ru.netology.nmedia.databinding.PostCardBinding
 import ru.netology.nmedia.dto.Ad
+import ru.netology.nmedia.dto.Date
 import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils.display
@@ -24,8 +25,9 @@ import ru.netology.nmedia.util.AndroidUtils.loadImage
 class FeedAdapter(
     private val onInteractionListener: OnInteractionListener,
 ) : PagingDataAdapter<FeedItem, RecyclerView.ViewHolder>(FeedItemDiffCallBack()) {
-    private val typeAd = 0
-    private val typePost = 1
+    private val typeDate = 0
+    private val typeAd = 1
+    private val typePost = 2
 
     interface OnInteractionListener {
         fun onLike(post: Post) {}
@@ -38,7 +40,11 @@ class FeedAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
+        if (position == 0) {
+            return typeDate
+        }
         return when (getItem(position)) {
+            is Date -> typeDate
             is Ad -> typeAd
             is Post -> typePost
             null -> throw IllegalArgumentException("unknown item type")
@@ -48,6 +54,9 @@ class FeedAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            typeDate -> DateViewHolder(
+                DateCardBinding.inflate(layoutInflater, parent, false)
+            )
             typeAd -> AdViewHolder(
                 AdCardBinding.inflate(layoutInflater, parent, false),
                 onInteractionListener
@@ -63,6 +72,7 @@ class FeedAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         getItem(position)?.let {
             when (it) {
+                is Date -> (holder as? DateViewHolder)?.bind(it)
                 is Post -> (holder as? PostViewHolder)?.bind(it)
                 is Ad -> (holder as? AdViewHolder)?.bind(it)
             }
@@ -162,7 +172,6 @@ class FeedAdapter(
         }
     }
 
-
     class AdViewHolder(
         private val binding: AdCardBinding,
         private val onInteractionListener: OnInteractionListener,
@@ -178,17 +187,29 @@ class FeedAdapter(
         }
     }
 
-    class FeedItemDiffCallBack : DiffUtil.ItemCallback<FeedItem>() {
-        override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
-            if (oldItem::class != newItem::class) {
-                return false
+    class DateViewHolder(
+        private val binding: DateCardBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(date: Date) {
+            binding.apply {
+                text.text = 
+                    itemView.resources.getText(date.text)
             }
+        }
+    }
+}
 
-            return oldItem == newItem
+class FeedItemDiffCallBack : DiffUtil.ItemCallback<FeedItem>() {
+    override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        if (oldItem::class != newItem::class) {
+            return false
         }
 
-        override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
-            return oldItem == newItem
-        }
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        return oldItem == newItem
     }
 }
