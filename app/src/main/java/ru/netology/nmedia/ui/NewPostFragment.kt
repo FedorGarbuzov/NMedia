@@ -2,10 +2,12 @@ package ru.netology.nmedia.ui
 
 import android.app.Activity
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -26,6 +28,7 @@ import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalCoroutinesApi::class)
 @AndroidEntryPoint
 class NewPostFragment : Fragment() {

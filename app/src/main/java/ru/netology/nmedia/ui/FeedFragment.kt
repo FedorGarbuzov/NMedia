@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,8 +20,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
-import ru.netology.nmedia.adapter.OnInterractionListener
-import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.adapter.FeedAdapter
+import ru.netology.nmedia.adapter.PagingLoadStateAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.AttachmentType
@@ -30,6 +32,7 @@ import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.O)
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels(
@@ -85,7 +88,7 @@ class FeedFragment : Fragment() {
 
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
-        val adapter = PostAdapter(object : OnInterractionListener {
+        val adapter = FeedAdapter(object : FeedAdapter.OnInteractionListener {
             override fun onLike(post: Post) {
                 if (authViewModel.authenticated) {
                     if (!post.likedByMe) viewModel.likedByMe(post.id) else viewModel.unlikedByMe(
@@ -154,7 +157,19 @@ class FeedFragment : Fragment() {
             viewModel.data.collectLatest(adapter::submitData)
         }
 
-        binding.postsList.adapter = adapter
+        binding.postsList.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
+                override fun onRetry() {
+                    adapter.retry()
+                }
+            }),
+            footer = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
+                override fun onRetry() {
+                    adapter.retry()
+                }
+            }),
+        )
+
         viewModel.dataState.observe(viewLifecycleOwner,
             { state ->
                 binding.progress.isVisible = state.loading
@@ -166,9 +181,7 @@ class FeedFragment : Fragment() {
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { state ->
                 binding.swipeRefresh.isRefreshing =
-                    state.refresh is LoadState.Loading ||
-                            state.prepend is LoadState.Loading ||
-                            state.append is LoadState.Loading
+                    state.refresh is LoadState.Loading
             }
         }
 

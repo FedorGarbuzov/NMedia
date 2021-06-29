@@ -38,4 +38,7 @@
     <string name="invalid_user">Неверный логин или пароль</string>
     <string name="cancelation">Вы уверены, что хотите выйти?</string>
     <string name="dialog_negative">ОТМЕНА</string>
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Завтра</string>
+    <string name="long_time_ago">Давно</string>
 </resources>

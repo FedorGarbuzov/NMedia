@@ -39,4 +39,7 @@
     <string name="cancelation">Are you sure you want to get out?</string>
     <string name="dialog_positive" translatable="false">OK</string>
     <string name="dialog_negative" tools:ignore="ButtonCase">CANCEL</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="long_time_ago">Long time ago</string>
 </resources>
