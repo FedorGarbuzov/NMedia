@@ -161,6 +161,7 @@ class FeedFragment : Fragment() {
             header = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
                 override fun onRetry() {
                     adapter.retry()
+                    scrollUp(adapter, binding)
                 }
             }),
             footer = PagingLoadStateAdapter(object : PagingLoadStateAdapter.OnInteractionListener {
@@ -210,14 +211,7 @@ class FeedFragment : Fragment() {
         binding.swipeRefresh.setOnRefreshListener {
             adapter.refresh()
             binding.swipeRefresh.isRefreshing = false
-            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(
-                    positionStart: Int,
-                    itemCount: Int,
-                ) {
-                    binding.postsList.scrollToPosition(0)
-                }
-            })
+            scrollUp(adapter, binding)
         }
 
         binding.add.setOnClickListener {
@@ -229,5 +223,14 @@ class FeedFragment : Fragment() {
         }
 
         return binding.root
+
+    }
+
+    private fun scrollUp(adapter: FeedAdapter, binding: FragmentFeedBinding) {
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                binding.postsList.scrollToPosition(0)
+            }
+        })
     }
 }

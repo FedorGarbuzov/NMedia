@@ -10,11 +10,18 @@ import ru.netology.nmedia.dto.Token
 interface UserApiService {
     @FormUrlEncoded
     @POST("users/authentication")
-    suspend fun updateUser(@Field("login") login: String, @Field("pass") pass: String): Response<Token>
+    suspend fun updateUser(
+        @Field("login") login: String,
+        @Field("pass") pass: String
+    ): Response<Token>
 
     @FormUrlEncoded
     @POST("users/registration")
-    suspend fun createUser(@Field("login") login: String, @Field("pass") pass: String, @Field("name") name: String): Response<Token>
+    suspend fun createUser(
+        @Field("login") login: String,
+        @Field("pass") pass: String,
+        @Field("name") name: String
+    ): Response<Token>
 
     @POST("users/push-tokens")
     suspend fun savePushToken(@Body pushToken: PushToken): Response<Unit>
