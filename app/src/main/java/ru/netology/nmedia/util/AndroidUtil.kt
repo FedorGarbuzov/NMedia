@@ -5,7 +5,12 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import retrofit2.Response
 import ru.netology.nmedia.R
+import ru.netology.nmedia.error.ApiError
+import ru.netology.nmedia.error.NetworkError
+import ru.netology.nmedia.error.UnknownError
+import java.io.IOException
 
 object AndroidUtils {
     fun hideKeyboard(view: View) {
@@ -33,20 +38,40 @@ object AndroidUtils {
 
     fun loadAvatar(imageView: ImageView, url: String) {
         Glide.with(imageView)
-                .load(url)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .circleCrop()
-                .into(imageView)
+            .load(url)
+            .placeholder(R.drawable.ic_loading_100dp)
+            .error(R.drawable.ic_error_100dp)
+            .timeout(10_000)
+            .circleCrop()
+            .into(imageView)
     }
 
     fun loadImage(imageView: ImageView, url: String) {
         Glide.with(imageView)
-                .load(url)
-                .placeholder(R.drawable.ic_loading_100dp)
-                .error(R.drawable.ic_error_100dp)
-                .timeout(10_000)
-                .into(imageView)
+            .load(url)
+            .placeholder(R.drawable.ic_loading_100dp)
+            .error(R.drawable.ic_error_100dp)
+            .timeout(10_000)
+            .into(imageView)
+    }
+
+    suspend fun <T, R> makeRequest(
+        request: suspend () -> Response<T>,
+        onSuccess: suspend (body: T) -> R
+    ): R {
+        try {
+            val response = request()
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body =
+                response.body() ?: throw ApiError(response.code(), response.message())
+            return onSuccess(body)
+        } catch (e: IOException) {
+            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
+        }
     }
 }

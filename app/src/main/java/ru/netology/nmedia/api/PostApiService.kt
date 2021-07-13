@@ -7,8 +7,6 @@ import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 
 interface PostApiService {
-    @GET("posts")
-    suspend fun getAll(): Response<List<Post>>
 
     @GET("posts/{id}/newer")
     suspend fun getNewer(@Path("id") id: Long): Response<List<Post>>
@@ -35,10 +33,10 @@ interface PostApiService {
     suspend fun removeById(@Path("id") id: Long): Response<Unit>
 
     @POST("posts/{id}/likes")
-    suspend fun likedByMe(@Path("id") id: Long): Response<Post>
+    suspend fun likeByMe(@Path("id") id: Long): Response<Post>
 
     @DELETE("posts/{id}/likes")
-    suspend fun unlikedByMe(@Path("id") id: Long): Response<Post>
+    suspend fun unlikeByMe(@Path("id") id: Long): Response<Post>
 
     @Multipart
     @POST("media")

@@ -43,19 +43,19 @@ class CardFragment : Fragment() {
     ): View? {
         val binding = FragmentCardBinding.inflate(inflater, container, false)
 
-        arguments?.postArg.let {
+        arguments?.postArg.let { post ->
             binding.apply {
-                if (it != null) {
-                    userName.text = it.author
-                    published.text = it.published
-                    content.text = it.content
-                    share.text = display(it.share)
-                    favorite.text = display(it.likes)
-                    views.text = display(it.views)
-                    if (it.attachment?.url == null) attachment.visibility = View.GONE
-                    postMenu.visibility = if (it.ownedByMe) View.VISIBLE else View.INVISIBLE
+                if (post != null) {
+                    userName.text = post.author
+                    published.text = post.published
+                    content.text = post.content
+                    share.text = display(post.share)
+                    favorite.text = display(post.likes)
+                    views.text = display(post.views)
+                    if (post.attachment?.url == null) attachment.visibility = View.GONE
+                    postMenu.visibility = if (post.ownedByMe) View.VISIBLE else View.INVISIBLE
 
-                    favorite.isChecked = it.likedByMe
+                    favorite.isChecked = post.likedByMe
 
                     postMenu.setOnClickListener { view ->
                         PopupMenu(view.context, view).apply {
@@ -63,7 +63,7 @@ class CardFragment : Fragment() {
                             setOnMenuItemClickListener { item ->
                                 when (item.itemId) {
                                     R.id.remove -> {
-                                        viewModel.removeById(it.id)
+                                        viewModel.removeById(post.id)
                                         findNavController().navigateUp()
                                         true
                                     }
@@ -71,8 +71,8 @@ class CardFragment : Fragment() {
                                         findNavController().navigate(
                                                 R.id.action_cardFragment_to_newPostFragment,
                                                 Bundle().apply {
-                                                    postArg = it
-                                                    viewModel.edit(it)
+                                                    postArg = post
+                                                    viewModel.edit(post)
                                                 })
                                         true
                                     }
@@ -82,30 +82,30 @@ class CardFragment : Fragment() {
                         }.show()
                     }
 
-                    done.isVisible = it.ownedByMe
-                    done.isEnabled = it.uploadedToServer
+                    done.isVisible = post.ownedByMe
+                    done.isEnabled = post.uploadedToServer
 
                     if (!done.isEnabled) {
                         favorite.isClickable = false
                         share.isClickable = false
                     }
 
-                    val avatarUrl = "$BASE_URL/avatars/${it.authorAvatar}"
+                    val avatarUrl = "$BASE_URL/avatars/${post.authorAvatar}"
                     loadAvatar(binding.postAvatar, avatarUrl)
 
-                    val mediaUrl = "$BASE_URL/media/${it.attachment?.url}"
+                    val mediaUrl = "$BASE_URL/media/${post.attachment?.url}"
                     loadImage(binding.attachment, mediaUrl)
                 }
 
                 binding.attachment.setOnClickListener { _ ->
-                    when (it?.attachment?.type) {
+                    when (post?.attachment?.type) {
                         AttachmentType.IMAGE -> findNavController().navigate(
                                 R.id.action_cardFragment_to_imageFragment,
                                 Bundle().apply {
-                                    textArg = it.attachment.url
+                                    textArg = post.attachment.url
                                 })
                         else -> {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it?.attachment?.url))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post?.attachment?.url))
                             if (activity?.packageManager?.let { intent.resolveActivity(it) } != null) {
                                 startActivity(intent)
                             } else {

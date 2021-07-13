@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 private val noPhoto = PhotoModel()
 
+@HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val repository: UserRepository,
     application: Application
@@ -43,7 +45,7 @@ class SignUpViewModel @Inject constructor(
                 noPhoto ->
                     if (login != "" && pass != "" && name != "") {
                         repository.createUser(login, pass, name)
-                        _registered.value = Unit
+                        _registered.call()
                     } else {
                         Toast.makeText(getApplication(), R.string.empty_field, Toast.LENGTH_LONG).show()
                     }
@@ -55,7 +57,7 @@ class SignUpViewModel @Inject constructor(
                                 name.toRequestBody("text/plain".toMediaType()),
                                 MediaUpload(it.toFile())
                         )
-                        _registered.value = Unit
+                        _registered.call()
                     }
             }
         } catch (e: Exception) {

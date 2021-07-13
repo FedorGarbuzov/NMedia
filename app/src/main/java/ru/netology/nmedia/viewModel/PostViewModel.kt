@@ -62,10 +62,8 @@ class PostViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val dbPosts: LiveData<FeedModel> =
-        repository.dbPosts.map { posts ->
-            FeedModel(posts, posts.isEmpty())
-        }.asLiveData(Dispatchers.Default)
+    private val dbPosts: LiveData<List<Post>> =
+        repository.dbPosts
 
     private val cached = repository
         .data
@@ -112,8 +110,8 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    val getNewer: LiveData<List<Post>> = dbPosts.switchMap {
-        repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
+    val getNewer: LiveData<List<Post>> = dbPosts.switchMap { posts ->
+        repository.getNewer(posts.firstOrNull()?.id ?: 0L)
             .catch { e -> e.printStackTrace() }
             .asLiveData()
     }
@@ -132,7 +130,6 @@ class PostViewModel @Inject constructor(
 
     fun loadPosts() = viewModelScope.launch {
         try {
-            delay(2000)
             _dataState.value = FeedModelState(loading = true)
             repository.getLatest()
             _dataState.value = FeedModelState()
@@ -162,15 +159,15 @@ class PostViewModel @Inject constructor(
                         .setConstraints(constraints)
                         .build()
                     workManager.enqueue(request)
-
-                    _dataState.value = FeedModelState()
+                    delay(2_000)
                     loadPosts()
+                    _dataState.value = FeedModelState()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     _dataState.value = FeedModelState(errorSaving = true)
                 }
             }
-            _postCreated.value = Unit
+            _postCreated.call()
         }
         edited.value = emptyPost
         _photo.value = noPhoto
@@ -209,24 +206,18 @@ class PostViewModel @Inject constructor(
                     .setConstraints(constraints)
                     .build()
                 workManager.enqueue(request)
-
-                _dataState.value = FeedModelState()
             } catch (e: Exception) {
                 Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
             }
         }
-        loadPosts()
     }
 
     fun likedByMe(id: Long) {
         viewModelScope.launch {
             try {
-                repository.likedByMe(id)
-                _dataState.value = FeedModelState()
-                loadPosts()
+                repository.likeByMe(id)
             } catch (e: Exception) {
                 Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
-                loadPosts()
             }
         }
     }
@@ -234,18 +225,16 @@ class PostViewModel @Inject constructor(
     fun unlikedByMe(id: Long) {
         viewModelScope.launch {
             try {
-                repository.unlikedByMe(id)
-                _dataState.value = FeedModelState()
-                loadPosts()
+                repository.unlikeByMe(id)
             } catch (e: Exception) {
                 Toast.makeText(getApplication(), R.string.error_loading, Toast.LENGTH_LONG).show()
-                loadPosts()
             }
         }
     }
 
     fun likeById(id: Long) = viewModelScope.launch { repository.likeById(id) }
     fun shareById(id: Long) = viewModelScope.launch { repository.shareById(id) }
+
     private fun insertDate(date: Int): Date {
         return Date(Random.nextLong(), date)
     }

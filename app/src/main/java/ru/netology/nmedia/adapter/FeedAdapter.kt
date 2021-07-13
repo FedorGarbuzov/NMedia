@@ -87,7 +87,6 @@ class FeedAdapter(
             binding.apply {
                 userName.text = post.author
                 loadAvatar(postAvatar, "${BASE_URL}/avatars/${post.authorAvatar}")
-//                postAvatar.setImageResource(itemViewType)
                 published.text = post.published
                 content.text = post.content
                 share.text = display(post.share)
@@ -122,29 +121,10 @@ class FeedAdapter(
                 }
 
                 val url = "$BASE_URL/avatars/${post.authorAvatar}"
-                Glide.with(binding.postAvatar)
-                    .load(url)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .circleCrop()
-                    .into(binding.postAvatar)
-
-                val attUrl = "$BASE_URL/images/${post.attachment?.url}"
-                Glide.with(binding.attachment)
-                    .load(attUrl)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .into(binding.attachment)
+                loadAvatar(binding.postAvatar, url)
 
                 val myUrl = "$BASE_URL/media/${post.attachment?.url}"
-                Glide.with(binding.attachment)
-                    .load(myUrl)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .into(binding.attachment)
+                loadImage(binding.attachment, myUrl)
 
                 favorite.setOnClickListener {
                     onInteractionListener.onLike(post)
@@ -205,7 +185,6 @@ class FeedItemDiffCallBack : DiffUtil.ItemCallback<FeedItem>() {
         if (oldItem::class != newItem::class) {
             return false
         }
-
         return oldItem.id == newItem.id
     }
 
