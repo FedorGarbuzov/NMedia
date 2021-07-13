@@ -11,7 +11,7 @@ import ru.netology.nmedia.dao.PostRemoteKeyDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostRemoteKeyEntity
-import ru.netology.nmedia.entity.fromPost
+import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
 
 @OptIn(ExperimentalPagingApi::class)
@@ -78,8 +78,8 @@ class PostRemoteMediator(
                         )
                     }
                 }
-                postDao.insert(body.fromPost().map {
-                    it.copy(uploadedToServer = true, read = true)
+                postDao.insert(body.toEntity().map {
+                    it.copy(read = true)
                 })
             }
             return MediatorResult.Success(endOfPaginationReached = body.isEmpty())

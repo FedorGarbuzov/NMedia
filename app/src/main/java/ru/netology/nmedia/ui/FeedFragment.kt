@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
-import ru.netology.nmedia.adapter.OnInterractionListener
+import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -85,7 +85,7 @@ class FeedFragment : Fragment() {
 
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
-        val adapter = PostAdapter(object : OnInterractionListener {
+        val adapter = PostAdapter(object : OnInteractionListener {
             override fun onLike(post: Post) {
                 if (authViewModel.authenticated) {
                     if (!post.likedByMe) viewModel.likedByMe(post.id) else viewModel.unlikedByMe(
@@ -214,6 +214,8 @@ class FeedFragment : Fragment() {
                 SignInFragment().show(parentFragmentManager, "Dialog")
             }
         }
+
+        binding.postsList.itemAnimator?.endAnimations()
 
         return binding.root
     }

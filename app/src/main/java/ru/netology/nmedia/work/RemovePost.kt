@@ -27,7 +27,7 @@ class RemovePostsWorker @AssistedInject constructor(
         }
 
         return try {
-            repository.removeByIdWork(id)
+            repository.removeById(id)
             Result.success()
         } catch (e: Exception) {
             Result.retry()

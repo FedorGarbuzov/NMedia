@@ -54,10 +54,13 @@ class PostViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val dbPosts: LiveData<FeedModel> =
-        repository.dbPosts.map { posts ->
-                FeedModel(posts, posts.isEmpty())
-        }.asLiveData(Dispatchers.Default)
+    private val dbPosts: LiveData<List<Post>> =
+        repository.dbPosts
+
+//    private val dbPosts: LiveData<FeedModel> =
+//        repository.dbPosts.let { posts ->
+//                FeedModel(posts, posts.isEmpty())
+//        }.asLiveData(Dispatchers.Default)
 
     private val cached = repository
         .data
@@ -82,8 +85,8 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    val getNewer: LiveData<List<Post>> = dbPosts.switchMap {
-        repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
+    val getNewer: LiveData<List<Post>> = dbPosts.switchMap { posts ->
+        repository.getNewer(posts.firstOrNull()?.id ?: 0L)
             .catch { e -> e.printStackTrace() }
             .asLiveData()
     }
@@ -115,7 +118,7 @@ class PostViewModel @Inject constructor(
         edited.value?.let {
             viewModelScope.launch {
                 try {
-                    val id = repository.saveWork(
+                    val id = repository.save(
                         it,
                         if (it.attachment?.url != _photo.value?.uri.toString()) {
                             _photo.value?.uri?.let { MediaUpload(it.toFile()) }
@@ -191,7 +194,7 @@ class PostViewModel @Inject constructor(
     fun likedByMe(id: Long) {
         viewModelScope.launch {
             try {
-                repository.likedByMe(id)
+                repository.likeByMe(id)
                 _dataState.value = FeedModelState()
                 loadPosts()
             } catch (e: Exception) {
@@ -204,7 +207,7 @@ class PostViewModel @Inject constructor(
     fun unlikedByMe(id: Long) {
         viewModelScope.launch {
             try {
-                repository.unlikedByMe(id)
+                repository.unlikeByMe(id)
                 _dataState.value = FeedModelState()
                 loadPosts()
             } catch (e: Exception) {
